@@ -1,0 +1,16 @@
+name: testing aiden
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: setting environment
+        run: apt-get update && apt-get install gcc
+
+      - name: build and run test
+        run: make all && ./testing_result
+
