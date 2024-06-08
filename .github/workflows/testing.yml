@@ -9,7 +9,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: setting environment
-        run: apt-get update && apt-get install gcc
+        run: sudo apt-get update && sudo apt-get install gcc
 
       - name: build and run test
         run: make all && ./testing_result
