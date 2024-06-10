@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -Iunity
 all: install_unittest testing_result
-testing_result: test/test_errno.c Unity/src/unity.c
-	$(CC) $(CFLAGS) -o testing_result test/test_errno.c Unity/src/unity.c
+testing_result:
+	$(CC) $(CFLAGS) -o testing_result test/main_test.c Unity/src/unity.c
 install_unittest:
 	git clone https://github.com/ThrowTheSwitch/Unity
 
