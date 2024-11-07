@@ -20,30 +20,14 @@
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
 
-%include "config.asm"
-%include "kernel/config.asm"
-
-[BITS 32]
-[ORG KERNEL_BASE_address]
-
-init:
-  %include "kernel/init.asm"
-clean:
-
-kernel:
-  jmp $
-
-  %include "kernel/macro/close.asm"
-  %include "kernel/macro/apic.asm"
+kernel_panic:
+  mov ah, 0x0C
+  mov edi, 0x000B8000
   
-  %include "kernel/panic.asm"
-  %include "kernel/page.asm"
-  %include "kernel/memory.asm"
-  %include "kernel/apic.asm"
-  %include "kernel/io_apic.asm"
-  %include "kernel/data.asm"
+.loop:
+  lodsb
+  stosw
+  dec ecx
+  jnz .loop
 
-  %include "lib/page_align_up.asm"
-  %include "lib/page_from_size.asm"
-
-end:
+  jmp $

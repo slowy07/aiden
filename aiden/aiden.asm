@@ -20,30 +20,21 @@
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
 
-%include "config.asm"
-%include "kernel/config.asm"
 
-[BITS 32]
-[ORG KERNEL_BASE_address]
+[BITS 16]
+[ORG STATIC_AIDEN_address]
 
-init:
-  %include "kernel/init.asm"
-clean:
+aiden:
+  cli
+  jmp 0x0000:.repair_cs
 
-kernel:
-  jmp $
+.repair_cs:
+  xor ax, ax
+  mov ds, ax
+  mov es, ax
+  mov ss, ax
 
-  %include "kernel/macro/close.asm"
-  %include "kernel/macro/apic.asm"
-  
-  %include "kernel/panic.asm"
-  %include "kernel/page.asm"
-  %include "kernel/memory.asm"
-  %include "kernel/apic.asm"
-  %include "kernel/io_apic.asm"
-  %include "kernel/data.asm"
+  mov sp, STATIC_AIDEN_stack
+  cld
 
-  %include "lib/page_align_up.asm"
-  %include "lib/page_from_size.asm"
-
-end:
+  mov edi, STATIC_AIDEN_memory_map

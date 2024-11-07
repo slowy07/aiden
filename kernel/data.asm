@@ -20,30 +20,22 @@
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
 
-%include "config.asm"
-%include "kernel/config.asm"
+align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
+kernel_gdt_header dw KENREL_PAGE_SIZE_byte
+                  dq STATIC_EMPTY
 
-[BITS 32]
-[ORG KERNEL_BASE_address]
+align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
+kernel_gdt_tss_bsp_selector dw STATIC_EMPTY
+kernel_gdt_tss_cpu_selector dw STATIC_EMPTY
 
-init:
-  %include "kernel/init.asm"
-clean:
+align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
+kernel_gdt_tss_table:
+                      dd STATIC_EMPTY
+                      dq KERNEL_STACK_pointer
+  times 92            db STATIC_EMPTY
+kernel_gdt_tss_table_end:
 
-kernel:
-  jmp $
-
-  %include "kernel/macro/close.asm"
-  %include "kernel/macro/apic.asm"
-  
-  %include "kernel/panic.asm"
-  %include "kernel/page.asm"
-  %include "kernel/memory.asm"
-  %include "kernel/apic.asm"
-  %include "kernel/io_apic.asm"
-  %include "kernel/data.asm"
-
-  %include "lib/page_align_up.asm"
-  %include "lib/page_from_size.asm"
-
-end:
+align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
+kernel_idt_header:
+                    dw KERNEL_PAGE_SIZE_byte
+                    dq STATIC_EMPTY

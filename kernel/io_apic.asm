@@ -20,30 +20,34 @@
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
 
-%include "config.asm"
-%include "kernel/config.asm"
+KERNEL_IO_APIC_ioregsel equ 0x00
+KERNEL_IO_APIC_iowin equ 0x10
+KERNEL_IO_APIC_iowin_low equ 0x00
+KERNEL_IO_APIC_iowin_high equ 0x01
 
-[BITS 32]
-[ORG KERNEL_BASE_address]
+KERNEL_IO_APIC_TRIGER_MODE_level equ 1000000000000000b
 
-init:
-  %include "kernel/init.asm"
-clean:
+kernel_io_apic_base_address dq STATIC_EMPTY
 
-kernel:
-  jmp $
+kernel_io_apic_connect:
+  push rax
+  push rbx
+  push rdi
 
-  %include "kernel/macro/close.asm"
-  %include "kernel/macro/apic.asm"
-  
-  %include "kernel/panic.asm"
-  %include "kernel/page.asm"
-  %include "kernel/memory.asm"
-  %include "kernel/apic.asm"
-  %include "kernel/io_apic.asm"
-  %include "kernel/data.asm"
+  mov rdi, qword [kernel_io_apic_base_address]
+  add ebx, KERNEL_IO_APIC_iowin_low
+  mov dword [rdi + KERNEL_IO_APIC_ioregsel], ebx
 
-  %include "lib/page_align_up.asm"
-  %include "lib/page_from_size.asm"
+  mov dword [rdi + KERNEL_IO_APIC_iowin], eax
 
-end:
+  add ebx, KERNEL_IO_APIC_iowin_high - KERNEL_IO_APIC_iowin_low
+  mov dword [rdi + KERNEL_IO_APIC_ioregsel], ebx
+
+  shr rax, STATIC_MOVE_HIGH_TO_EAX_shift
+  mov dword [rdi + KERNEL_IO_APIC_iowin], eax
+
+  pop rdi
+  pop rbx
+  pop rax
+
+  ret
