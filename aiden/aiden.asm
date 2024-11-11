@@ -43,21 +43,80 @@ aiden:
 
   sti
 
+  call aiden_line_a20_check
+  jz .unlocked
+
   mov ax, 0x2401
   int 0x15
+
+  call aiden_line_a20_check
+  jz .unlocked
 
   in al, 0x92
   or al, 2
   out 0x92, al
 
-  mov ax, 0x003
+  call aiden_line_a20_check
+  jz .unlocked
+
+  in al, 0xEE
+
+  call aiden_line_a20_check
+  jz .unlocked
+
+  cli
+
+  call aiden_ps2_keyboard_in
+
+  mov al, 0xAD
+  out 0x64, al
+
+  call aiden_ps2_keyboard_in
+  
+  mov al, 0xD0
+  out 0x64, al
+
+  call aiden_ps2_keyboard_out
+
+  in al, 0x60
+
+  push ax
+
+  call aiden_ps2_keyboard_in
+
+  mov al, 0xD1
+  out 0x64, al
+
+  call aiden_ps2_keyboard_in
+
+  pop ax
+
+  or al, 2
+  out 0x60, al
+
+  call aiden_ps2_keyboard_in
+
+  mov al, 0xAE
+  out 0x64, al
+
+  call aiden_ps2_keyboard_in
+
+  sti
+
+  mov si, STATIC_AIDEN_ERROR_a20
+
+  call aiden_line_a20_check
+  jnz aiden_panic
+
+.unlocked:
+  mov ax, 0x0003
   int 0x10
 
   mov ah, 0x42
   mov si, aiden_table_disk_address_packet
   int 0x13
 
-  mov si, STATIC_AIDEN_ERROR_device
+  mov si, STATIC_AIDEN_ERROR_disk
   
   jc aiden_panic
 
@@ -86,19 +145,55 @@ aiden:
   out DRIVER_PIC_PORT_SLAVE_data, al
   out DRIVER_PIC_PORT_MASTER_data, al
 
+  mov ax, 0x4F00
+  mov si, STATIC_AIDEN_ERROR_video
+  mov di, STATIC_AIDEN_video_vga_info_block
+  int 0x10
+
+  test ax, 0x4F00
+  jnz aiden_panic
+  
+  mov esi, dword [di + STATIC_AIDEN_VIDEO_STRUCTURE_VGA_INFO_BLOCK.video_mode_ptr]
+
+.loop:
+  cmp word [esi], 0xFFFF
+  je .error
+
+  mov ax, 0x4F01
+  mov cx, word [esi]
+  moc di, STATIC_AIDEN_video_mode_info_block
+  int 0x10
+
+  cmp word [di + STATIC_AIDEN_VIDEO_STRUCTURE_MODE_INFO_BLOCK.x_resolution], STATIC_AIDEN_VIDEO_WIDTH_pixel
+  jne .next
+
+  cmp word [di + STATIC_AIDEN_VIDEO_STRUCTURE_MODE_INFO_BLOCK.y_resolution], STATIC_AIDEN_VIDEO_HEIGHT_pixel
+  jne .next
+
+  cmp byte [di + STATIC_AIEDN_VIDEO_STRUCTURE_MODE_INFO_BLOCK.bits_per_pixel], STATIC_AIDEN_VIDEO_DEPTH_bit
+  je .found
+
+.next:
+  add esi, STATIC_WORD_SIZE_byte
+  jmp .loop
+
+.error:
+  mov si, STATIC_AIDEN_ERROR_video
+  jmp aiden_panic
+
+.found:
+  mov ax, 0x4F02
+  mov bx, word [esi]
+  or bx, STATIC_AIDEN_VIDEO_MODE_linear | STATIC_AIDEN_VIDEO_MODE_clean
+  int 0x10
+
+  test ah, ah
+  jnz .error
+
   cli
 
-%if STATIC_AIDEN_bit_mode = 16
-  mov ax, STATIC_AIDEN_kernel_address
-  mov ds, ax
-  mov es, ax
-  sti
-  mov ebx, STATIC_AIDEN_memory_map
-
-  jmp STATIC_AIDEN_kernel_address:0x0000
-%endif
-
   lgdt [aiden_header_gdt_32bit]
+
   mov eax, cr0
   bts eax, 0
   mov cr0, eax
@@ -111,6 +206,29 @@ aiden_panic:
   
   mov word [ds:0x0000], si
   jmp $
+
+aiden_line_a20_check:
+  push ds
+
+  mov ax, 0xFFFF
+  mov ds, ax
+
+  mov ebx, dword [ds:STATIC_AIDEN_address + 0x10]
+  pop ds
+  test ebx, dword [ds:STATIC_AIDEN_address]
+  ret
+
+aiden_ps2_keyboard_in:
+  in al, 0x64
+  test al, 2
+  jnz aiden_ps2_keyboard_in
+  ret
+
+aiden_ps2_keyboard_out:
+  in al, 0x64
+  test al, 1
+  jnz aiden_ps2_keyboard_out
+  ret
 
 [BITS 32]
 
@@ -135,60 +253,8 @@ aiden_protected_mode:
   mov ecx, (file_kernel_end - file_kernel) / 0x04
   rep movsd
 
-%if STATIC_AIDEN_bit_mode = 32
   mov ebx, STATIC_AIDEN_multiboot_header
   jmp STATIC_AIDEN_kernel_address << STATIC_SEGMENT_to_pointer << STATIC_SEGMENT_to_pointer
-%endif
-
-  xor eax, eax
-  mov ecx, (STATIC_PAGE_SIZE_4KiB_byte * 0x06) / 0x04
-  mov edi, STATIC_PML4_TABLE_address
-  rep stosd
-
-  mov dword [STATIC_PML4_TABLE_address], STATIC_PML4_TABLE_address + STATIC_PAGE_SIZE_4KiB_byte + STATIC_PAGE_FLAG_default
-
-  mov dword [STATIC_PML4_TABLE_address + STATIC_PAGE_SIZE_4KiB_byte], STATIC_PML4_TABLE_address + (STATIC_PAGE_SIZE_4KiB_byte * 0x02) + STATIC_PAGE_FLAG_default
-  mov dword [STATIC_PML4_TABLE_address + STATIC_PAGE_SIZE_4KiB_byte + 0x08], STATIC_PML4_TABLE_address + (STATIC_PAGE_SIZE_4KiB_byte * 0x03) + STATIC_PAGE_FLAG_default
-  mov dword [STATIC_PML4_TABLE_address + STATIC_PAGE_SIZE_4KiB_byte + 0x10], STATIC_PML4_TABLE_address + (STATIC_PAGE_SIZE_4KiB_byte * 0x04) + STATIC_PAGE_FLAG_default
-  mov dword [STATIC_PML4_TABLE_address + STATIC_PAGE_SIZE_4KiB_byte + 0x18], STATIC_PML4_TABLE_address + (STATIC_PAGE_SIZE_4KiB_byte * 0x05) + STATIC_PAGE_FLAG_default
-
-  mov eax, STATIC_PAGE_FLAG_default + STATIC_PAGE_FLAG_2MiB_size
-  mov ecx, 512 * 0x04
-  mov edi, STATIC_PML4_TABLE_address + (STATIC_PAGE_SIZE_4KiB_byte * 0x02)
-  
-.next:
-  stosd
-  add edi, 0x04
-
-  add eax, STATIC_PAGE_FLAG_2MiB_size
-  dec ecx
-  jnc .next
-
-  lgdt [aiden_header_gdt_64bit]
-  mov eax, 1010100000b
-
-  mov cr4, eax
-
-  mov eax, STATIC_PML4_TABLE_address
-  mov cr3, eax
-  
-  mov ecx, 0xC0000080
-  rdmsr
-  or eax, 100000000b
-  wrmsr
-
-  mov eax, cr0
-  or eax, 0x80000001
-  mov cr0, eax
-
-  jmp 0x0008:aiden_long_mode
-
-[BITS 64]
-
-aiden_long_mode:
-  mov ebx, STATIC_AIDEN_multiboot_header
-  jmp STATIC_AIDEN_kernel_address << STATIC_SEGMENT_to_pointer << STATIC_SEGMENT_to_pointer
-  ret
 
 align 0x04
 aiden_table_disk_address_packet:
@@ -199,22 +265,16 @@ aiden_table_disk_address_packet:
   dw STATIC_AIDEN_kernel_address
   dq 0x0000000000000001
 
-align 0x04
+align 0x10
 aiden_table_gdt_32bit:
-  dw aiden_table_gdt_32bit_end - aiden_table_gdt_32bit - 0x01
-  dd aiden_table_gdt_32bit
+  dq STATIC_EMPTY
+  dq 0000000011001111100110000000000000000000000000001111111111111111b
+  dq 0000000011001111100100100000000000000000000000001111111111111111b
 aiden_table_gdt_32bit_end:
 
-align 0x08
-aiden_table_gdt_64bit:
-  dq STATIC_EMPTY
-  dq 0000000000100000100110000000000000000000000000000000000000000000b
-  dq 0000000000100000100100100000000000000000000000000000000000000000b
-aiden_table_gdt_64bit_end:
-
-aiden_header_gdt_64bit:
-  dw aiden_table_gdt_64bit_end - aiden_table_gdt_64bit - 0x01
-  dd aiden_table_gdt_64bit
+aiden_header_gdt_32bit:
+  dw aiden_table_gdt_32bit_end - aiden_table_gdt_32bit - 0x01
+  dd aiden_table_gdt_32bit
 
 times 510 - ($ - $$) db STATIC_EMPTY
                      dw STATIC_AIDEN_magic
