@@ -20,8 +20,19 @@
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
 
+KERNEL_INIT_MEMORY_MULTIBOOT_FLAG_video equ 12
+
 kernel_init_video:
-  call kernel_video_dump
+  bt dword [ebx + HEADER_multiboot.flags], KERNEL_INIT_MEMORY_MULTIBOOT_FLAG_video
+  jnc kernel_panic
+
+  mov edi, dword [ebx + HEADER_multiboot.framebuffer_addr]
+  mov qword [kernel_video_base_address], rdi
+  mov qword [kernel_video_framebuffer], rdi
+  mov qword [kernel_video_pointer], rdi
+
+  call kernel_video_drain
+
   mov ecx, kernel_init_string_video_welcome_end - kernel_init_string_video_welcome
   mov rsi, kernel_init_string_video_welcome
   call kernel_video_string
