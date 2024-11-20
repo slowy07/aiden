@@ -20,6 +20,12 @@
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
 
+
+; switching mode to 32 bit protected mode. initialize GDT and enable protected
+; with setting control register flag
+; this code will be initialize segment descriptor and enable cpu protected mode
+; for 32 bit operation context
+
 [BITS 16]
 [ORG 0x8000]
 
@@ -40,6 +46,7 @@ bott:
   bts eax, 0
   mov cr0, eax
 
+  ; update CS register to enter protected mode
   jmp long 0x0008:boot_protected_mode
 
 [BITS 32]
