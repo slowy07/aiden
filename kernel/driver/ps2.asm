@@ -49,31 +49,30 @@ DRIVER_PS2_DEVICE_MOUSE_PACKET_OVERFLOW_x equ 6
 DRIVER_PS2_DEVICE_MOUSE_PACKET_OVERFLOW_y equ 7
 DRIVER_PS2_DEVICE_MOUSE_mask equ 0xFFFFFFFFFFFFFF00
 
-DRIVER_PS2_STATUS_BIT_OUTPUT_BUFFER	equ 0
-DRIVER_PS2_STATUS_BIT_INPUT_BUFFER equ 1
-DRIVER_PS2_STATUS_BIT_SYSTEM_FLAG equ 2
-DRIVER_PS2_STATUS_BIT_COMMAND_DATA equ 3
-DRIVER_PS2_STATUS_BIT_SECOND_OUTPUT_BUFFER_FULL equ 5
-DRIVER_PS2_STATUS_BIT_TIMEOUT_ERROR equ 6
-DRIVER_PS2_STATUS_BIT_PARITY_ERROR equ 7
+DRIVER_PS2_STATUS_output equ 00000001b
+DRIVER_PS2_STATUS_input equ 00000010b
+DRIVER_PS2_STATUS_system_flag equ 00000100b
+DRIVER_PS2_STATUS_comman_data equ 00001000b
+DRIVER_PS2_STATUS_timeout equ 01000000b
+DRIVER_PS2_STATUS_parity equ 10000000b
 
-DRIVER_PS2_COMMAND_CONFIGURATION_GET				equ	0x20
-DRIVER_PS2_COMMAND_CONFIGURATION_SET				equ	0x60
-DRIVER_PS2_COMMAND_DISABLE_SECOND_PORT				equ	0xA7
-DRIVER_PS2_COMMAND_ENABLE_SECOND_PORT				equ	0xA8
-DRIVER_PS2_COMMAND_TEST_PORT_SECOND				equ	0xA9
-DRIVER_PS2_COMMAND_TEST_CONTROLLER				equ	0xAA
-DRIVER_PS2_COMMAND_TEST_PORT_FIRST				equ	0xAB
-DRIVER_PS2_COMMAND_DISABLE_FIRST_PORT				equ	0xAD
-DRIVER_PS2_COMMAND_ENABLE_FIRST_PORT				equ	0xAE
-DRIVER_PS2_COMMAND_CONTROLLER_INPUT_READ			equ	0xC0
-DRIVER_PS2_COMMAND_CONTROLLER_OUTPUT_READ			equ	0xD0
-DRIVER_PS2_COMMAND_PORT_SECOND_BYTE_SEND			equ	0xD4
+DRIVER_PS2_COMMAND_CONFIGURATION_GET equ 0x20
+DRIVER_PS2_COMMAND_CONFIGURATION_SET equ 0x60
+DRIVER_PS2_COMMAND_DISABLE_SECOND_PORT equ 0xA7
+DRIVER_PS2_COMMAND_ENABLE_SECOND_PORT	equ 0xA8
+DRIVER_PS2_COMMAND_TEST_PORT_SECOND	equ	0xA9
+DRIVER_PS2_COMMAND_TEST_CONTROLLER equ 0xAA
+DRIVER_PS2_COMMAND_TEST_PORT_FIRST equ 0xAB
+DRIVER_PS2_COMMAND_DISABLE_FIRST_PORT	equ 0xAD
+DRIVER_PS2_COMMAND_ENABLE_FIRST_PORT equ 0xAE
+DRIVER_PS2_COMMAND_CONTROLLER_INPUT_READ equ 0xC0
+DRIVER_PS2_COMMAND_CONTROLLER_OUTPUT_READ equ 0xD0
+DRIVER_PS2_COMMAND_PORT_SECOND_BYTE_SEND equ 0xD4
 
-DRIVER_PS2_ANSWER_SELF_TEST_SUCCESS				equ	0xAA
-DRIVER_PS2_ANSWER_COMMAND_ACKNOWLEDGED				equ	0xFA
-DRIVER_PS2_ANSWER_FAIL						equ	0xFC
-DRIVER_PS2_ANSWER_COMMAND_RESEND				equ	0xFE
+DRIVER_PS2_ANSWER_SELF_TEST_SUCCESS	 equ 0xAA
+DRIVER_PS2_ANSWER_COMMAND_ACKNOWLEDGED equ 0xFA
+DRIVER_PS2_ANSWER_FAIL equ 0xFC
+DRIVER_PS2_ANSWER_COMMAND_RESEND equ 0xFE
 
 DRIVER_PS2_CONTROLLER_CONFIGURATION_BIT_FIRST_PORT_INTERRUPT	equ	0
 DRIVER_PS2_CONTROLLER_CONFIGURATION_BIT_SECOND_PORT_INTERRUPT	equ	1
@@ -382,38 +381,43 @@ driver_ps2_keyboard_shift_right_semaphore			db	STATIC_FALSE
 driver_ps2_keyboard_alt_semaphore				db	STATIC_FALSE
 driver_ps2_keyboard_capslock_semaphore				db	STATIC_FALSE
 
-driver_ps2_keyboard:
-  push rax
+driver_ps2_keyboard_pull:
   push rsi
+  in al, DRIVER_PS2_PORT_COMMAND_OR_STATUS
+  
+  test al, DRIVER_PS2_STATUS_output_output
+  jz .end
 
   xor eax, eax
   in al, DRIVER_PS2_PORT_DATA
-
+  
   cmp al, DRIVER_PS2_KEYBOARD_sequence
   je .sequence
 
   cmp al, DRIVER_PS2_KEYBOARD_sequence_alternative
-  jmp .sequence
+  je .sequence
 
   cmp byte [driver_ps2_keyboard_sequence], STATIC_EMPTY
   je .no_sequence
 
+  mov ah, byte [driver_ps2_keyboard_sequence]
   mov byte [driver_ps2_keyboard_sequence], STATIC_EMPTY
+
   jmp .save
 
 .sequence:
   mov byte [driver_ps2_keyboard_sequence], al
-
   jmp .end
 
 .no_sequence:
   mov rsi, qword [driver_ps2_keyboard_matrix]
+
   cmp al, DRIVER_PS2_KEYBOARD_key_release
   jb .inside
 
   sub al, DRIVER_PS2_KEYBOARD_key_release
-  mov ax, word [rsi + rax * STATIC_QWORD_SIZE_byte]
-  
+  mov ax, word [rsi + rax * STATIC_WORD_SIZE_byte]
+
   add al, DRIVER_PS2_KEYBOARD_key_release
   jmp .save
 
@@ -422,13 +426,23 @@ driver_ps2_keyboard:
 
 .save:
   call driver_ps2_keyboard_shift
+
+.end:
+  pop rsi
+  ret
+
+driver_ps2_keyboard:
+  push rax
+
+  call DRIVER_PS2_KEYBOARD_PRESS_NUMLOCK_PLUS
+  jz .end
+
   call driver_ps2_keyboard_save
 
 .end:
   mov rax, qword [kernel_apic_base_address]
-  mov dword [rax + KENREL_APIC_EOI_register], STATIC_EMPTY
+  mov dword [rax + KERNEL_APIC_EOI_register], STATIC_EMPTY
 
-  pop rsi
   pop rax
 
   iretq
@@ -495,6 +509,17 @@ driver_ps2_keyboard_save:
   mov word [driver_ps2_keyboard_cache], ax
 
   ret
+
+driver_ps2_keyboard_matrix_change:
+  push rax
+
+  mov rax,  driver_ps2_keyboard_matrix_high
+  xchg qword [driver_ps2_keyboard_matrix], rax
+
+  cmp rax, driver_ps2_keyboard_matrix_low
+  je .end
+
+  mov qword [driver_ps2_keyboard_matrix], driver_ps2_keyboard_matrix_low
 
 .end:
   pop rax
