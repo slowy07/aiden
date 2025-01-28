@@ -1,4 +1,4 @@
-![aiden banner](./github/banner.png)
+![aiden banner](.github/banner.png)
 
 simple operating system written with assembly x86_64
 
