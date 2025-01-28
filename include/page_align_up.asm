@@ -1,4 +1,4 @@
-library_page_align_up:
+include_page_align_up:
 	push rdi
 
 	and di, KERNEL_PAGE_mask

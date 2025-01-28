@@ -1,5 +1,4 @@
-
-library_page_from_size:
+include_page_from_size:
 
 	push	rcx
 

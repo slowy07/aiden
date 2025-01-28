@@ -25,14 +25,14 @@ kernel_init_page:
 	mov	rax,	KERNEL_VIDEO_BASE_address
 	or	bx,	KERNEL_PAGE_FLAG_write_through | KERNEL_PAGE_FLAG_cache_disable
 	mov	ecx,	KERNEL_VIDEO_SIZE_byte
-	call	library_page_from_size
+	call	include_page_from_size
 	call	kernel_page_map_physical
 	jc	kernel_init_panic_low_memory
 
 	mov	rax,	qword [kernel_apic_base_address]
 	mov	bx,	KERNEL_PAGE_FLAG_available | KERNEL_PAGE_FLAG_write
 	mov	ecx,	dword [kernel_apic_size]
-	call	library_page_from_size
+	call	include_page_from_size
 	call	kernel_page_map_physical
 	jc	kernel_init_panic_low_memory
 

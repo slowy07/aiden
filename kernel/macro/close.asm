@@ -7,5 +7,5 @@
 	test al, al
 	jz   .1
 
-	pop rax
+	pop rdx
 	%ENDMACRO

@@ -43,7 +43,7 @@ kernel_init_memory:
 	mov qword [kernel_page_free_count], rcx
 
 	mov  rdi, kernel_end
-	call library_page_align_up
+	call include_page_align_up
 
 	mov qword [kernel_memory_map_address], rdi
 
@@ -51,7 +51,7 @@ kernel_init_memory:
 
 	push rcx
 
-	call library_page_from_size
+	call include_page_from_size
 	call kernel_page_drain_few
 
 	pop rcx
@@ -61,7 +61,7 @@ kernel_init_memory:
 
 	mov qword [kernel_memory_map_address_end], rdi
 
-	call library_page_align_up
+	call include_page_align_up
 	sub  rdi, KERNEL_BASE_address
 	shr  rdi, STATIC_DIVIDE_BY_PAGE_shift
 

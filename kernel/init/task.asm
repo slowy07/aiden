@@ -6,7 +6,7 @@ kernel_init_task:
 
 	shl	ecx,	STATIC_MULTIPLE_BY_8_shift
 
-	call	library_page_from_size
+	call	include_page_from_size
 
 	call	kernel_memory_alloc
 	jc	kernel_init_panic_low_memory
