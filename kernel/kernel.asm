@@ -13,7 +13,7 @@ clean:
 
 kernel:
 
-	jmp $
+	jmp service_http
 
 %include "kernel/macro/close.asm"
 %include "kernel/macro/apic.asm"
@@ -27,6 +27,8 @@ kernel:
 %include "kernel/idt.asm"
 %include "kernel/task.asm"
 %include "kernel/driver/rtc.asm"
+%include "kernel/driver/network/i82540em.asm"
+%include "kernel/servce/http.asm"
 %include "include/page_align_up.asm"
 %include "include/page_from_size.asm"
 
