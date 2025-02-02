@@ -6,8 +6,8 @@ run test:
 
 ```
 nasm -f bin kernel/init/boot.asm -o build/boot
-nasm -f bin kernel/kernel asm -o build/kernel -dMULTIBOOT_VIDEO_WIDTH_pixel=640 -dMULTIBOOT_VIDEO_HEIGHT_pixel=480 -dMULTIBOOT_VIDEO_WIDTH_pixel=640 -dMULTIBOOT_VIDEO_HEIGHT_pixel=480
-nasm -f bin aiden/aiden -o build/disk.raw -dMULTIBOOT_VIDEO_WIDTH_pixel=640 -dMULTIBOOT_VIDEO_HEIGHT_pixel=480 -dMULTIBOOT_VIDEO_WIDTH_pixel=640 -dMULTIBOOT_VIDEO_HEIGHT_pixel=480
+nasm -f bin kernel/kernel asm -o build/kernel -dMULTIBOOT_VIDEO_WIDTH_pixel=640 -dMULTIBOOT_VIDEO_HEIGHT_pixel=480
+nasm -f bin aiden/aiden -o build/disk.raw -dMULTIBOOT_VIDEO_WIDTH_pixel=640 -dMULTIBOOT_VIDEO_HEIGHT_pixel=480
 ```
 
 running on qemu:
