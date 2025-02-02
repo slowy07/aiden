@@ -24,72 +24,6 @@ aiden:
 
 	sti
 
-	call aiden_line_a20_check
-	jz   .unlocked
-
-	mov ax, 0x2401
-	int 0x15
-
-	call aiden_line_a20_check
-	jz   .unlocked
-
-	in  al, 0x92
-	or  al, 2
-	out 0x92, al
-
-	call aiden_line_a20_check
-	jz   .unlocked
-
-	in al, 0xEE
-
-	call aiden_line_a20_check
-	jz   .unlocked
-
-	cli
-
-	call aiden_ps2_keyboard_in
-
-	mov al, 0xAD
-	out 0x64, al
-
-	call aiden_ps2_keyboard_in
-
-	mov al, 0xD0
-	out 0x64, al
-
-	call aiden_ps2_keyboard_out
-
-	in al, 0x60
-
-	push ax
-
-	call aiden_ps2_keyboard_in
-
-	mov al, 0xD1
-	out 0x64, al
-
-	call aiden_ps2_keyboard_in
-
-	pop ax
-
-	or  al, 2
-	out 0x60, al
-
-	call aiden_ps2_keyboard_in
-
-	mov al, 0xAE
-	out 0x64, al
-
-	call aiden_ps2_keyboard_in
-
-	sti
-
-	mov si, STATIC_AIDEN_ERROR_a20
-
-	call aiden_line_a20_check
-	jnz  aiden_panic
-
-.unlocked:
 	mov ax, 0x0003
 	int 0x10
 
@@ -277,6 +211,16 @@ aiden_header_gdt_32bit:
 	dw aiden_table_gdt_32bit_end - aiden_table_gdt_32bit - 0x01
 	dd aiden_table_gdt_32bit
 
+	times 436 - ($ - $$) db 0x00
+	db    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+
+	db 0x00
+	db 0x00, 0x00, 0x00
+	db 0xEB
+	db 0x00, 0x00, 0x00
+	dd (file_kernel_end - $$) / 512
+	dd (1048576 - (file_kernel_end - $$)) / 512
+
 	times 510 - ($ - $$) db STATIC_EMPTY
 	dw    STATIC_AIDEN_magic
 
@@ -286,3 +230,5 @@ file_kernel:
 	align  STATIC_SECTOR_SIZE_byte
 
 file_kernel_end:
+
+	times 1048576 - ($ - $$) db STATIC_EMPTY

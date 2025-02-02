@@ -25,6 +25,7 @@ kernel_init:
 	%include "kernel/init/ps2.asm"
 	%include "kernel/init/ipc.asm"
 	%include "kernel/init/vfs.asm"
+  %include "kernel/init/storage.asm"
 	%include "kernel/init/network.asm"
 	%include "kernel/init/task.asm"
 	%include "kernel/init/services.asm"

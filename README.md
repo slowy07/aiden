@@ -15,6 +15,11 @@ running on qemu:
 qemu-system-x86_64 -drive file=build/disk.raw,media=disk,format=raw -m 2
 ```
 
+running qemu with configuration 2MiB RAM, 2 logic processor, and disk connected to AHCI controller in port 0
+```
+qemu-system-x86_64  -m 2 -smp 2 -rtc base=localtime -drive file=build/disk.raw,if=none,id=sata0,format=raw -device ich9-ahci,id=ahci -device ide-drive,drive=sata0,bus=ahci.0
+```
+
 reference:
 
 - [os dev](https://wiki.osdev.org/Expanded_Main_Page)

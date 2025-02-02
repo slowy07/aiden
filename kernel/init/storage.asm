@@ -1,0 +1,1 @@
+kernel_init_storage:
