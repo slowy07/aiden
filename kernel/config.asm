@@ -1,6 +1,6 @@
 %define KERNEL_name "aiden"
 %define KERNEL_version "1"
-%define KERNEL_revision "1"
+%define KERNEL_revision "2"
 %define KERNEL_architecture "x86_64"
 
 KERNEL_BASE_address equ 0x0000000000100000
