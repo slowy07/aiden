@@ -13,16 +13,18 @@ DRIVER_RTC_PORT_month equ 0x08
 DRIVER_RTC_PORT_year equ 0x09
 DRIVER_RTC_PORT_STATUS_REGISTER_A equ 0x0A
 DRIVER_RTC_PORT_STATUS_REGISTER_B equ 0x0B
+
 DRIVER_RTC_PORT_STATUS_REGISTER_A_rate equ 00000110b
 DRIVER_RTC_PORT_STATUS_REGISTER_A_divider equ 00100000b
 DRIVER_RTC_PORT_STATUS_REGISTER_A_update_in_progress equ 10000000b
-DRIVER_RTC_PORT_STATUS_REGISTER_B_daylight_savings equ 00000001b
-DRIVER_RTC_PORT_STATUS_REGISTER_B_24_hour_mode  equ 00000010b
-DRIVER_RTC_PORT_STATUS_REGISTER_B_binary_mode  equ 00000100b
-DRIVER_RTC_PORT_STATUS_REGISTER_B_periodic_interrupt equ 01000000b
-DRIVER_RTC_PORT_STATUS_REGISTER_C   equ 0x0C
 
-DRIVER_RTC_Hz      equ 1024
+DRIVER_RTC_PORT_STATUS_REGISTER_B_daylight_savings equ 00000001b
+DRIVER_RTC_PORT_STATUS_REGISTER_B_24_hour_mode equ 00000010b
+DRIVER_RTC_PORT_STATUS_REGISTER_B_binary_mode equ 00000100b
+DRIVER_RTC_PORT_STATUS_REGISTER_B_periodic_interrupt equ 01000000b
+DRIVER_RTC_PORT_STATUS_REGISTER_C equ 0x0C
+
+DRIVER_RTC_Hz equ 1024
 
 struc   DRIVER_RTC_STRUCTURE_TIME
 .second resb 1
@@ -31,24 +33,27 @@ struc   DRIVER_RTC_STRUCTURE_TIME
 .day    resb 1
 .month  resb 1
 .year   resb 1
-.day_of_week     resb 1
+.day_of_week resb 1
 endstruc
 
-driver_rtc_semaphore     db STATIC_FALSE
+driver_rtc_semaphore db STATIC_FALSE
 
-driver_rtc_microtime     dq STATIC_EMPTY
+driver_rtc_microtime dq STATIC_EMPTY
 
-driver_rtc_time      dq STATIC_EMPTY
+driver_rtc_time dq STATIC_EMPTY
 
 driver_rtc:
 	push rax
-	inc  qword [driver_rtc_microtime]
+
+	inc qword [driver_rtc_microtime]
 
 	in al, DRIVER_RTC_PORT_data
 
 	mov rax, qword [kernel_apic_base_address]
 	mov dword [rax + KERNEL_APIC_EOI_register], STATIC_EMPTY
+
 	pop rax
+
 	iretq
 
 driver_rtc_get_date_and_time:
@@ -65,6 +70,7 @@ driver_rtc_get_date_and_time:
 	in  al, DRIVER_RTC_PORT_data
 
 	mov byte [driver_rtc_time + DRIVER_RTC_STRUCTURE_TIME.minute], al
+
 	mov al, DRIVER_RTC_PORT_hour
 	out DRIVER_RTC_PORT_command, al
 	in  al, DRIVER_RTC_PORT_data

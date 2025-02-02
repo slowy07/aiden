@@ -1,11 +1,11 @@
-KERNEL_IO_APIC_ioregsel   equ 0x00
-KERNEL_IO_APIC_iowin   equ 0x10
-KERNEL_IO_APIC_iowin_low  equ 0x00
-KERNEL_IO_APIC_iowin_high  equ 0x01
+KERNEL_IO_APIC_ioregsel equ 0x00
+KERNEL_IO_APIC_iowin equ 0x10
+KERNEL_IO_APIC_iowin_low equ 0x00
+KERNEL_IO_APIC_iowin_high equ 0x01
 
 KERNEL_IO_APIC_TRIGER_MODE_level equ 1000000000000000b
 
-kernel_io_apic_base_address  dq STATIC_EMPTY
+kernel_io_apic_base_address dq STATIC_EMPTY
 
 kernel_io_apic_connect:
 	push rax

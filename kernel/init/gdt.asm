@@ -5,10 +5,10 @@ endstruc
 
 struc KERNEL_STRUCTURE_GDT
 .null resb 8
-.cs_ring0     resb 8
-.ds_ring0     resb 8
-.cs_ring3     resb 8
-.ds_ring3     resb 8
+.cs_ring0 resb 8
+.ds_ring0 resb 8
+.cs_ring3 resb 8
+.ds_ring3 resb 8
 .tss  resb 8
 
 .SIZE:
@@ -23,15 +23,19 @@ kernel_init_gdt:
 
 	xor eax, eax
 	stosq
+
 	mov rax, 0000000000100000100110000000000000000000000000000000000000000000b
 	stosq
 
 	mov rax, 0000000000100000100100100000000000000000000000000000000000000000b
 	stosq
+
 	mov rax, 0000000000100000111110000000000000000000000000000000000000000000b
 	stosq
+
 	mov rax, 0000000000100000111100100000000100000000000000000000000000000000b
 	stosq
+
 	and di, ~KERNEL_PAGE_mask
 	mov word [kernel_gdt_tss_bsp_selector], di
 
@@ -51,10 +55,11 @@ kernel_init_gdt:
 	mov ax, kernel_gdt_tss_table_end - kernel_gdt_tss_table
 	stosw
 
-	mov  rax, kernel_gdt_tss_table
+	mov rax, kernel_gdt_tss_table
 	stosw
-	shr  rax, 16
+	shr rax, 16
 	stosb
+
 	push rax
 
 	mov al, 10001001b
@@ -63,6 +68,7 @@ kernel_init_gdt:
 	stosb
 
 	pop rax
+
 	shr rax, 8
 	stosb
 
@@ -78,3 +84,11 @@ kernel_init_gdt:
 	lgdt [kernel_gdt_header]
 
 	ltr word [kernel_gdt_tss_bsp_selector]
+
+	mov fs, ax
+	mov gs, ax
+
+	mov ax, KERNEL_STRUCTURE_GDT.ds_ring0
+	mov ds, ax
+	mov es, ax
+	mov ss, ax

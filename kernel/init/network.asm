@@ -13,13 +13,14 @@ kernel_init_network:
 
 	call kernel_memory_alloc_page
 	jc   kernel_panic
+
 	call kernel_page_drain
-	mov  qword [kernel_network_port_table], rdi
+	mov  qword [service_network_port_table], rdi
 
 	call kernel_memory_alloc_page
 	jc   kernel_panic
 
 	call kernel_page_drain
-	mov  qword [kernel_network_stack_address], rdi
+	mov  qword [service_network_stack_address], rdi
 
 .end:

@@ -25,6 +25,7 @@ kernel_init_rtc:
 	mov  bx, KERNEL_IDT_TYPE_irq
 	mov  rdi, driver_rtc
 	call kernel_idt_mount
+
 	mov  eax, KERNEL_IDT_IRQ_offset + DRIVER_RTC_IRQ_number
 	mov  ebx, DRIVER_RTC_IO_APIC_register
 	call kernel_io_apic_connect

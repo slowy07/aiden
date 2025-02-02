@@ -19,6 +19,4 @@ kernel_init_apic:
 
 	mov dword [rsi + KERNEL_APIC_TDC_register], KERNEL_APIC_TDC_divide_by_16
 
-	sti
-
 	ret
