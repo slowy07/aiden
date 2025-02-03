@@ -42,6 +42,15 @@ kernel_init_string_memory_size_end:
 
 kernel_init_string_memory_format_end:
 
+kernel_init_string_storage_ide db STATIC_COLOR_ASCII_GREEN_LIGHT, "::", STATIC_COLOR_ASCII_DEFAULT, " IDE storage devices:", STATIC_ASCII_NEW_LINE
+kernel_init_string_storage_ide_end:
+kernel_init_string_storage_ide_hd db "   /dev/hd"
+kernel_init_string_storage_ide_hd_end:
+kernel_init_string_storage_ide_size db " of size ", STATIC_COLOR_ASCII_WHITE
+kernel_init_string_storage_ide_size_end:
+kernel_init_string_storage_ide_format db " KiB", STATIC_ASCII_NEW_LINE
+kernel_init_string_storage_ide_format_end:
+
 	kernel_init_string db STATIC_ASCII_NEW_LINE, STATIC_COLOR_ASCII_BLUE_LIGHT, "   Arfy Slowy", STATIC_ASCII_NEW_LINE
 	db STATIC_COLOR_ASCII_GRAY, "  ---------------------------", STATIC_ASCII_NEW_LINE, STATIC_ASCII_NEW_LINE
 
