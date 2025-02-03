@@ -20,6 +20,12 @@ running qemu with configuration 2MiB RAM, 2 logic processor, and disk connected 
 qemu-system-x86_64  -m 2 -smp 2 -rtc base=localtime -drive file=build/disk.raw,if=none,id=sata0,format=raw -device ich9-ahci,id=ahci -device ide-drive,drive=sata0,bus=ahci.0
 ```
 
+running qemu with configuration 2MiB RAM, 2 logic processor, and IDE controller
+```
+qemu-system-x86_64 -hda file=build/disk.raw -m 2 -smp 2 -rtc base=localtime
+```
+
+
 reference:
 
 - [os dev](https://wiki.osdev.org/Expanded_Main_Page)
