@@ -9,3 +9,29 @@ kernel_init_vfs:
 
 	mov  rsi, rdi
 	call kernel_vfs_dir_symlinks
+
+  mov rsi, kernel_init_vfs_directory_structure
+
+.loop:
+  movzx ecx, byte [rsi]
+
+  test cl, cl
+  jz .end
+
+  inc rsi
+
+  push rcx
+  push rsi
+
+  call kernel_vfs_path_resolve
+
+  mov dl, KERNEL_VFS_FILE_TYPE_directory
+  call kernel_vfs_file_touch
+
+  pop rsi
+  pop rcx
+
+  add rsi, rcx
+  jmp .loop
+
+.end:

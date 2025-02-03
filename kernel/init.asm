@@ -33,7 +33,6 @@ kernel_init:
 	call kernel_init_apic
 	mov  dword [rsi + KERNEL_APIC_TICR_register], DRIVER_RTC_Hz
 	mov  dword [rsi + KERNEL_APIC_EOI_register], STATIC_EMPTY
-	sti
 
 	%include "kernel/init/smp.asm"
 

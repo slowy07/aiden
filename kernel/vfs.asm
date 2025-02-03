@@ -284,8 +284,6 @@ kernel_vfs_file_touch:
 	mov qword [rax + KERNEL_STRUCTURE_VFS_KNOT.size], 1
 
 .regular_file:
-	mov word [rax + KERNEL_STRUCTURE_VFS_KNOT.mode], bx
-	mov byte [rax + KERNEL_STRUCTURE_VFS_KNOT.type], dl
 	mov byte [rax + KERNEL_STRUCTURE_VFS_KNOT.length], cl
 
 	push rax
