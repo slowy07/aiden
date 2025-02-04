@@ -2,6 +2,11 @@
 
 simple operating system written with assembly x86_64
 
+## requirements system
+- cpu with dual core
+- 2MiB RAM
+- 3MiB storage
+
 run test:
 
 ```

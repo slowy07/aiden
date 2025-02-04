@@ -362,7 +362,7 @@ kernel_task_active:
 
 macro_debug "kernel_task_active"
 
-kernel_task_kill_me:
+kernel_task_kill:
 	call kernel_task_active
 
 	and word [rdi + KERNEL_STRUCTURE_TASK.flags], ~KERNEL_TASK_FLAG_active
@@ -370,4 +370,4 @@ kernel_task_kill_me:
 
 	jmp $
 
-macro_debug "kernel_task_kill_me"
+macro_debug "kernel_task_kill"

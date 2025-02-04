@@ -1,4 +1,4 @@
-kernel_thread_exec:
+kernel_thread:
 	push rax
 	push rbx
 	push rcx

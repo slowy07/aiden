@@ -33,6 +33,11 @@ kernel_init_idt:
 	mov bx, KERNEL_IDT_TYPE_exception
 	mov rdi, kernel_idt_exception_page_fault
 
+	mov  eax, 0x40
+	mov  bx, KERNEL_IDT_TYPE_isr
+	mov  rdi, kernel_service
+	call kernel_idt_mount
+
 	mov  eax, 0xFF
 	mov  bx, KERNEL_IDT_TYPE_irq
 	mov  rdi, kernel_idt_spurious_interrupt
