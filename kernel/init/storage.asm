@@ -11,8 +11,6 @@ kernel_init_storage:
 	mov  rsi, kernel_init_string_storage_ide
 	call kernel_video_string
 
-	mov eax, "a"
-
 	mov cl, 0x04
 
 	mov rsi, kernel_init_string_storage_ide_hd
@@ -26,19 +24,27 @@ kernel_init_storage:
 	push rax
 	push rcx
 	push rsi
+	push rdi
+
+	mov rax, qword [rdi + DRIVER_IDE_STRUCTURE_DEVICE.size_sectors]
+	shl rax, STATIC_MULTIPLE_BY_512_shift
+
+	mov  ecx, kernel_init_string_storage_ide_hd_end - kernel_init_string_storage_ide_hd_path
+	mov  rsi, kernel_init_string_storage_ide_hd_path
+	call kernel_vfs_path_resolve
+	mov  rbx, qword [rsp]
+	mov  dl, KERNEL_VFS_FILE_TYPE_block_device
+	call kernel_vfs_file_touch
+
+	mov qword [rdi + KERNEL_VFS_STRUCTURE_KNOT.size], rax
 
 	mov  ecx, kernel_init_string_storage_ide_hd_end - kernel_init_string_storage_ide_hd
 	call kernel_video_string
-
-	mov  cl, 0x01
-	call kernel_video_char
 
 	mov  ecx, kernel_init_string_storage_ide_size_end - kernel_init_string_storage_ide_size
 	mov  rsi, kernel_init_string_storage_ide_size
 	call kernel_video_string
 
-	mov  rax, qword [rdi + DRIVER_IDE_STRUCTURE_DEVICE.size_sectors]
-	mov  rsi, STATIC_MULTIPLE_BY_512_shift
 	shr  rax, STATIC_DIVIDE_BY_1024_shift
 	mov  ebx, STATIC_NUMBER_SYSTEM_decimal
 	xor  ecx, ecx
@@ -48,15 +54,17 @@ kernel_init_storage:
 	mov  rsi, kernel_init_string_storage_ide_format
 	call kernel_video_string
 
+	pop rdi
 	pop rsi
 	pop rcx
 	pop rax
 
 .ide_next:
-	inc al
+	inc byte [kernel_init_string_storage_ide_hd_letter]
 	add rdi, DRIVER_IDE_STRUCTURE_DEVICE.SIZE
 
 	dec cl
 	jnz .ide_loop
 
 .ide_end:
+	xchg bx, bx

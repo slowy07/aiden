@@ -43,12 +43,12 @@ KERNEL_VFS_ERROR_FILE_low_memory          equ 0x06
 KERNEL_VFS_ERROR_FILE_overflow            equ 0x07
 KERNEL_VFS_ERROR_FILE_no_directory        equ 0x08
 
-struc KERNEL_STRUCTURE_VFS_MAGICKNOT
+struc KERNEL_VFS_STRUCTURE_MAGICKNOT
 .root resb 8
 .size resb 8
 endstruc
 
-struc   KERNEL_STRUCTURE_VFS_KNOT
+struc   KERNEL_VFS_STRUCTURE_KNOT
 .id_or_data resb 8
 .size   resb 8
 .owner  resb 2
@@ -75,35 +75,37 @@ kernel_vfs_dir_symlinks:
 	push rax
 	push rbx
 
-	mov rbx, qword [rdi + KERNEL_STRUCTURE_VFS_KNOT.id_or_data]
+	mov rbx, qword [rdi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
-	mov qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.id_or_data], rdi
+	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], rdi
 
-	mov word [rbx + KERNEL_STRUCTURE_VFS_KNOT.mode], KERNEL_VFS_FILE_MODE_USER_full_control | KERNEL_VFS_FILE_MODE_GROUP_execute_or_traverse | KERNEL_VFS_FILE_MODE_OTHER_execute_or_traverse
+	; FIXME: something wrong this code
+	; mov word [rbx + KERNEL_VFS_STRUCTURE_KNOT.mode], KERNEL_VFS_FILE_MODE_USER_full_control | KERNEL_VFS_FILE_MODE_GROUP_execute_or_traverse | KERNEL_VFS_FILE_MODE_OTHER_execute_or_traverse
 
-	mov word [rbx + KERNEL_STRUCTURE_VFS_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link
-
-	mov rax, qword [driver_rtc_microtime]
-	mov qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.time_modified], rax
-
-	mov byte [rbx + KERNEL_STRUCTURE_VFS_KNOT.length], 0x01
-
-	mov byte [rbx + KERNEL_STRUCTURE_VFS_KNOT.name], "."
-
-	add rbx, KERNEL_STRUCTURE_VFS_KNOT.SIZE
-
-	mov qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.id_or_data], rsi
-
-	mov word [rbx + KERNEL_STRUCTURE_VFS_KNOT.mode], KERNEL_VFS_FILE_MODE_USER_full_control | KERNEL_VFS_FILE_MODE_GROUP_execute_or_traverse | KERNEL_VFS_FILE_MODE_OTHER_execute_or_traverse
-
-	mov word [rbx + KERNEL_STRUCTURE_VFS_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link
+	mov word [rbx + KERNEL_VFS_STRUCTURE_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link
 
 	mov rax, qword [driver_rtc_microtime]
-	mov qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.time_modified], rax
+	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.time_modified], rax
 
-	mov byte [rbx + KERNEL_STRUCTURE_VFS_KNOT.length], 0x02
+	mov byte [rbx + KERNEL_VFS_STRUCTURE_KNOT.length], 0x01
 
-	mov word [rbx + KERNEL_STRUCTURE_VFS_KNOT.name], ".."
+	mov byte [rbx + KERNEL_VFS_STRUCTURE_KNOT.name], "."
+
+	add rbx, KERNEL_VFS_STRUCTURE_KNOT.SIZE
+
+	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], rsi
+
+	; FIXME: something wrong this code
+	; mov word [rbx + KERNEL_STRUCTURE_VFS_KNOT.mode], KERNEL_VFS_FILE_MODE_USER_full_control | KERNEL_VFS_FILE_MODE_GROUP_execute_or_traverse | KERNEL_VFS_FILE_MODE_OTHER_execute_or_traverse
+
+	mov word [rbx + KERNEL_VFS_STRUCTURE_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link
+
+	mov rax, qword [driver_rtc_microtime]
+	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.time_modified], rax
+
+	mov byte [rbx + KERNEL_VFS_STRUCTURE_KNOT.length], 0x02
+
+	mov word [rbx + KERNEL_VFS_STRUCTURE_KNOT.name], ".."
 
 	pop rbx
 	pop rax
@@ -190,15 +192,15 @@ kernel_vfs_path_resolve:
 	call kernel_vfs_file_find
 	jc   .error
 
-	bt  word [rdi + KERNEL_STRUCTURE_VFS_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link_bit
+	bt  word [rdi + KERNEL_VFS_STRUCTURE_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link_bit
 	jnc .no_link
 
-	mov rdi, qword [rdi + KERNEL_STRUCTURE_VFS_KNOT.id_or_data]
+	mov rdi, qword [rdi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
 .no_link:
 	mov eax, KERNEL_VFS_ERROR_FILE_no_directory
 
-	bt  word [rdi + KERNEL_STRUCTURE_VFS_KNOT.type], KERNEL_VFS_FILE_TYPE_directory_bit
+	bt  word [rdi + KERNEL_VFS_STRUCTURE_KNOT.type], KERNEL_VFS_FILE_TYPE_directory_bit
 	jnc .error
 
 	sub qword [rsp], rcx
@@ -252,7 +254,7 @@ kernel_vfs_file_touch:
 
 	mov eax, KERNEL_VFS_ERROR_FILE_name_long
 
-	cmp rcx, KERNEL_STRUCTURE_VFS_KNOT.SIZE - KERNEL_STRUCTURE_VFS_KNOT.name
+	cmp rcx, KERNEL_VFS_STRUCTURE_KNOT.SIZE - KERNEL_VFS_STRUCTURE_KNOT.name
 	ja  .error
 
 	mov eax, KERNEL_VFS_ERROR_FILE_name_short
@@ -272,24 +274,34 @@ kernel_vfs_file_touch:
 
 	mov rax, rdi
 
-	test dl, KERNEL_VFS_FILE_TYPE_directory
-	jz   .regular_file
+	cmp dl, KERNEL_VFS_FILE_TYPE_directory
+	je  .directory
 
+	cmp dl, KERNEL_VFS_FILE_TYPE_block_device
+	jne .regular_file
+
+	mov qword [rax + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], rbx
+
+	jmp .regular_file
+
+.directory:
 	call kernel_memory_alloc_page
 	jc   .end
 
 	call kernel_page_drain
 
-	mov qword [rax + KERNEL_STRUCTURE_VFS_KNOT.id_or_data], rdi
-	mov qword [rax + KERNEL_STRUCTURE_VFS_KNOT.size], 1
+	mov qword [rax + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], rdi
+	mov qword [rax + KERNEL_VFS_STRUCTURE_KNOT.size], 1
 
 .regular_file:
-	mov byte [rax + KERNEL_STRUCTURE_VFS_KNOT.length], cl
+	mov byte [rax + KERNEL_VFS_STRUCTURE_KNOT.length], cl
+
+	mov byte [rax + KERNEL_VFS_STRUCTURE_KNOT.type], dl
 
 	push rax
 
 	mov rdi, rax
-	add rdi, KERNEL_STRUCTURE_VFS_KNOT.name
+	add rdi, KERNEL_VFS_STRUCTURE_KNOT.name
 	rep movsb
 
 	pop rdi
@@ -316,16 +328,16 @@ kernel_vfs_file_find:
 
 	mov rax, rcx
 
-	mov rdi, qword [rdi + KERNEL_STRUCTURE_VFS_KNOT.id_or_data]
+	mov rdi, qword [rdi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
 .prepare:
-	mov rcx, STATIC_STRUCTURE_BLOCK.link / KERNEL_STRUCTURE_VFS_KNOT.SIZE
+	mov rcx, STATIC_STRUCTURE_BLOCK.link / KERNEL_VFS_STRUCTURE_KNOT.SIZE
 
 .loop:
-	cmp byte [rdi + KERNEL_STRUCTURE_VFS_KNOT.length], al
+	cmp byte [rdi + KERNEL_VFS_STRUCTURE_KNOT.length], al
 	jne .next
 
-	add rdi, KERNEL_STRUCTURE_VFS_KNOT.name
+	add rdi, KERNEL_VFS_STRUCTURE_KNOT.name
 
 	xchg rcx, rax
 
@@ -335,10 +347,10 @@ kernel_vfs_file_find:
 
 	jnc .found
 
-	sub rdi, KERNEL_STRUCTURE_VFS_KNOT.name
+	sub rdi, KERNEL_VFS_STRUCTURE_KNOT.name
 
 .next:
-	add rdi, KERNEL_STRUCTURE_VFS_KNOT.SIZE
+	add rdi, KERNEL_VFS_STRUCTURE_KNOT.SIZE
 
 	loop .loop
 
@@ -352,7 +364,7 @@ kernel_vfs_file_find:
 	jmp .end
 
 .found:
-	sub rdi, KERNEL_STRUCTURE_VFS_KNOT.name
+	sub rdi, KERNEL_VFS_STRUCTURE_KNOT.name
 	mov qword [rsp], rdi
 
 .end:
@@ -368,16 +380,16 @@ kernel_vfs_knot_prepare:
 
 	macro_close kernel_vfs_semaphore, 0
 
-	mov rdi, qword [rdi + KERNEL_STRUCTURE_VFS_KNOT.id_or_data]
+	mov rdi, qword [rdi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
 .prepare:
-	mov ecx, STATIC_STRUCTURE_BLOCK.link / KERNEL_STRUCTURE_VFS_KNOT.SIZE
+	mov ecx, STATIC_STRUCTURE_BLOCK.link / KERNEL_VFS_STRUCTURE_KNOT.SIZE
 
 .loop:
-	cmp byte [rdi + KERNEL_STRUCTURE_VFS_KNOT.type], STATIC_EMPTY
+	cmp byte [rdi + KERNEL_VFS_STRUCTURE_KNOT.type], STATIC_EMPTY
 	je  .ready
 
-	add rdi, KERNEL_STRUCTURE_VFS_KNOT.SIZE
+	add rdi, KERNEL_VFS_STRUCTURE_KNOT.SIZE
 
 	loop .loop
 
@@ -401,7 +413,7 @@ kernel_vfs_knot_prepare:
 	mov qword [rcx], rdi
 
 .ready:
-	mov byte [rdi + KERNEL_STRUCTURE_VFS_KNOT.length], STATIC_TRUE
+	mov byte [rdi + KERNEL_VFS_STRUCTURE_KNOT.length], STATIC_TRUE
 
 .end:
 	mov byte [kernel_vfs_semaphore], STATIC_FALSE
@@ -419,7 +431,7 @@ kernel_vfs_file_write:
 
 	mov rbx, rdi
 
-	cmp qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.id_or_data], STATIC_EMPTY
+	cmp qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], STATIC_EMPTY
 	jne .exist
 
 	call kernel_memory_alloc_page
@@ -427,12 +439,12 @@ kernel_vfs_file_write:
 
 	call kernel_page_drain
 
-	mov qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.id_or_data], rdi
+	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], rdi
 
 .exist:
 	mov rdx, qword [rsp + STATIC_QWORD_SIZE_byte]
 
-	mov rdi, qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.id_or_data]
+	mov rdi, qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
 	cmp rcx, STATIC_STRUCTURE_BLOCK.link
 	jbe .all_in_one
@@ -499,10 +511,10 @@ kernel_vfs_file_write:
 	add qword [kernel_page_free_count], rbp
 
 	mov rcx, qword [rsp + STATIC_QWORD_SIZE_byte]
-	mov qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.size], rcx
+	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.size], rcx
 
 	mov rcx, qword [driver_rtc_microtime]
-	mov qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.time_modified], rcx
+	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.time_modified], rcx
 
 .end:
 	pop rdi
@@ -524,7 +536,7 @@ kernel_vfs_file_append:
 
 	mov rbx, rdi
 
-	cmp qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.id_or_data], STATIC_EMPTY
+	cmp qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], STATIC_EMPTY
 	jne .exist
 
 	mov eax, KERNEL_VFS_ERROR_FILE_low_memory
@@ -534,10 +546,10 @@ kernel_vfs_file_append:
 
 	call kernel_page_drain
 
-	mov qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.id_or_data], rdi
+	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], rdi
 
 .exist:
-	mov rdi, qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.id_or_data]
+	mov rdi, qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
 .last_one:
 	cmp qword [rdi + STATIC_STRUCTURE_BLOCK.link], STATIC_EMPTY
@@ -548,7 +560,7 @@ kernel_vfs_file_append:
 	jmp .last_one
 
 .found:
-	mov rax, qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.size]
+	mov rax, qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.size]
 	mov rcx, STATIC_STRUCTURE_BLOCK.link
 	xor edx, edx
 	div rcx
@@ -599,10 +611,10 @@ kernel_vfs_file_append:
 
 .ready:
 	mov rcx, qword [rsp + STATIC_QWORD_SIZE_byte * 0x03]
-	add qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.size], rcx
+	add qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.size], rcx
 
 	mov rcx, qword [driver_rtc_microtime]
-	mov qword [rbx + KERNEL_STRUCTURE_VFS_KNOT.time_modified], rcx
+	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.time_modified], rcx
 
 .end:
 	add rsp, STATIC_QWORD_SIZE_byte
@@ -622,15 +634,15 @@ kernel_vfs_file_read:
 	push rdi
 
 .symbolic_link:
-	bt  word [rsi + KERNEL_STRUCTURE_VFS_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link_bit
+	bt  word [rsi + KERNEL_VFS_STRUCTURE_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link_bit
 	jnc .file
 
-	mov rsi, qword [rsi + KERNEL_STRUCTURE_VFS_KNOT.id_or_data]
+	mov rsi, qword [rsi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 	jmp .symbolic_link
 
 .file:
-	mov rax, qword [rsi + KERNEL_STRUCTURE_VFS_KNOT.size]
-	bt  word [rsi + KERNEL_STRUCTURE_VFS_KNOT.type], KERNEL_VFS_FILE_TYPE_directory_bit
+	mov rax, qword [rsi + KERNEL_VFS_STRUCTURE_KNOT.size]
+	bt  word [rsi + KERNEL_VFS_STRUCTURE_KNOT.type], KERNEL_VFS_FILE_TYPE_directory_bit
 	jnc .regular_file
 
 	mov rcx, STATIC_STRUCTURE_BLOCK.link
@@ -638,7 +650,7 @@ kernel_vfs_file_read:
 
 .regular_file:
 	push rax
-	mov  rsi, qword [rsi + KERNEL_STRUCTURE_VFS_KNOT.id_or_data]
+	mov  rsi, qword [rsi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
 .loop:
 	mov rcx, STATIC_STRUCTURE_BLOCK.link

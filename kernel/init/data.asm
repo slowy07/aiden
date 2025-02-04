@@ -42,13 +42,21 @@ kernel_init_string_memory_size_end:
 
 kernel_init_string_memory_format_end:
 
-kernel_init_string_storage_ide db STATIC_COLOR_ASCII_GREEN_LIGHT, "::", STATIC_COLOR_ASCII_DEFAULT, " IDE storage devices:", STATIC_ASCII_NEW_LINE
+	kernel_init_string_storage_ide db STATIC_COLOR_ASCII_GREEN_LIGHT, "::", STATIC_COLOR_ASCII_DEFAULT, " IDE storage devices:", STATIC_ASCII_NEW_LINE
+
 kernel_init_string_storage_ide_end:
-kernel_init_string_storage_ide_hd db "   /dev/hd"
+
+	kernel_init_string_storage_ide_hd db "   "
+	kernel_init_string_storage_ide_hd_path db "/dev/hd"
+	kernel_init_string_storage_ide_hd_letter db "a"
+
 kernel_init_string_storage_ide_hd_end:
-kernel_init_string_storage_ide_size db " of size ", STATIC_COLOR_ASCII_WHITE
+
+	kernel_init_string_storage_ide_size db " of size ", STATIC_COLOR_ASCII_WHITE
+
 kernel_init_string_storage_ide_size_end:
-kernel_init_string_storage_ide_format db " KiB", STATIC_ASCII_NEW_LINE
+	kernel_init_string_storage_ide_format db " KiB", STATIC_ASCII_NEW_LINE
+
 kernel_init_string_storage_ide_format_end:
 
 	kernel_init_string db STATIC_ASCII_NEW_LINE, STATIC_COLOR_ASCII_BLUE_LIGHT, "   Arfy Slowy", STATIC_ASCII_NEW_LINE
@@ -74,9 +82,9 @@ kernel_init_services_list:
 	dq STATIC_EMPTY
 
 kernel_init_vfs_directory_structure:
-  db 0x04
-  db "/dev"
-  db STATIC_EMPTY
+	db 0x04
+	db "/dev"
+	db STATIC_EMPTY
 
 kernel_init_boot_file:
 	incbin "build/boot"
