@@ -39,7 +39,7 @@ kernel_init_storage:
 	mov qword [rdi + KERNEL_VFS_STRUCTURE_KNOT.size], rax
 
 	mov  ecx, kernel_init_string_storage_ide_hd_end - kernel_init_string_storage_ide_hd
-  mov rsi, kernel_init_string_storage_ide_hd
+	mov  rsi, kernel_init_string_storage_ide_hd
 	call kernel_video_string
 
 	mov  ecx, kernel_init_string_storage_ide_size_end - kernel_init_string_storage_ide_size
@@ -68,4 +68,3 @@ kernel_init_storage:
 	jnz .ide_loop
 
 .ide_end:
-	xchg bx, bx

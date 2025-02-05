@@ -3,7 +3,7 @@
 
 [BITS 64]
 [DEFAULT REL]
-[ORG SOFTWARE_base_address]
+[ORG SOFTWARE_BASE_address]
 
 hello:
   mov ax, KERNEL_SERVICE_VIDEO_string

@@ -83,8 +83,21 @@ kernel_init_services_list:
 
 kernel_init_vfs_directory_structure:
 	db 0x04
+	db "/bin"
+	db 0x04
 	db "/dev"
 	db STATIC_EMPTY
+
+kernel_init_vfs_files:
+	dq kernel_init_vfs_file_hello
+	dq kernel_init_vfs_file_hello_end - kernel_init_vfs_file_hello
+	db 10
+	db "/bin/hello"
+	dq STATIC_EMPTY
+
+	kernel_init_vfs_file_hello incbin "build/hello"
+
+kernel_init_vfs_file_hello_end:
 
 kernel_init_boot_file:
 	incbin "build/boot"
