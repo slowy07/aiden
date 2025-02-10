@@ -36,6 +36,7 @@ service_network_tcp:
 	pop rdx
 	pop rcx
 	pop rax
+
 	jmp service_network.end
 
 macro_debug "service_network_tcp"
@@ -93,6 +94,7 @@ service_network_tcp_psh:
 	pop rcx
 	pop rbx
 	pop rax
+
 	jmp service_network_tcp.end
 
 macro_debug "service_network_tcp_psh_ack"
@@ -111,7 +113,6 @@ service_network_tcp_fin:
 	mov   eax, dword [rdi + SERVICE_NETWORK_STRUCTURE_FRAME_ETHERNET.SIZE + rbx + SERVICE_NETWORK_STRUCTURE_FRAME_TCP.sequence]
 	bswap eax
 	inc   eax
-	mov   dword [rsi + SERVICE_NETWORK_STRUCTURE_TCP_STACK.source_sequence], eax
 
 	mov eax, dword [rsi + SERVICE_NETWORK_STRUCTURE_TCP_STACK.request_acknowledgement]
 	inc eax
@@ -145,6 +146,7 @@ service_network_tcp_fin:
 	pop rcx
 	pop rbx
 	pop rax
+
 	jmp service_network_tcp.end
 
 macro_debug "service_network_tcp_fin"
@@ -168,6 +170,8 @@ service_network_tcp_ack:
 	pop rsi
 
 	jmp service_network_tcp.end
+
+macro_debug "service_network_tcp_ack"
 
 service_network_tcp_find:
 	push rax
@@ -224,6 +228,7 @@ service_network_tcp_find:
 	pop rax
 
 	ret
+
 macro_debug "service_network_tcp_find"
 
 service_network_tcp_syn:
@@ -293,6 +298,8 @@ service_network_tcp_syn:
 
 	jmp service_network_tcp.end
 
+macro_debug "service_network_tcp_syn"
+
 service_network_tcp_reply:
 	push rax
 	push rbx
@@ -342,13 +349,15 @@ service_network_tcp_pseudo_header:
 
 	ret
 
+macro_debug "service_network_tcp_pseudo_header"
+
 service_network_tcp_port_assign:
 	push rax
 	push rcx
 	push rdx
 	push rdi
 
-	macro_close service_network_port_semaphore, 0
+	macro_lock service_network_port_semaphore, 0
 
 	cmp cx, 512
 	jnb .error
@@ -358,7 +367,7 @@ service_network_tcp_port_assign:
 	mul ecx
 
 	call kernel_task_active
-	mov  rcx, qword [rdi + KERNEL_STRUCTURE_TASK.pid]
+	mov  rcx, qword [rdi + KERNEL_TASK_STRUCTURE.pid]
 
 	mov  rdi, qword [service_network_port_table]
 	test rdi, rdi
@@ -383,6 +392,8 @@ service_network_tcp_port_assign:
 	pop rax
 
 	ret
+
+macro_debug "service_network_tcp_port_assign"
 
 service_network_tcp_port_send:
 	push rax
@@ -423,3 +434,5 @@ service_network_tcp_port_send:
 	pop rax
 
 	ret
+
+macro_debug "service_network_tcp_port_send"

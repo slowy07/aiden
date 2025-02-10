@@ -35,4 +35,3 @@ include_string_to_integer:
 
 	ret
 
-macro_debug "include_string_to_integer"

@@ -8,9 +8,9 @@ ACPI_MADT_APIC_FLAG_ENABLED_bit equ 0
 struc      ACPI_STRUCTURE_RSDP
 .signature resb 8
 .checksum  resb 1
-.oem_id resb 6
+.oem_id    resb 6
 .revision  resb 1
-.rsdt_address resb 4
+.rsdt_address   resb 4
 
 .SIZE:
 	endstruc
@@ -18,7 +18,7 @@ struc      ACPI_STRUCTURE_RSDP
 	struc     ACPI_STRUCTURE_XSDP
 	.rsdp     resb ACPI_STRUCTURE_RSDP.SIZE
 	.length   resb 4
-	.xsdt_address resb 8
+	.xsdt_address   resb 8
 	.checksum resb 1
 	.reserved resb 3
 
@@ -30,11 +30,11 @@ struc      ACPI_STRUCTURE_RSDP
 	.length    resb 4
 	.revision  resb 1
 	.checksum  resb 1
-	.oem_id resb 6
-	.oem_table_id resb 8
-	.oem_revision resb 4
-	.creator_id resb 4
-	.creator_revision resb 4
+	.oem_id    resb 6
+	.oem_table_id   resb 8
+	.oem_revision   resb 4
+	.creator_id   resb 4
+	.creator_revision  resb 4
 
 .SIZE:
 	endstruc
@@ -44,12 +44,12 @@ struc      ACPI_STRUCTURE_RSDP
 	.length    resb 4
 	.revision  resb 1
 	.checksum  resb 1
-	.oem_id resb 6
-	.oem_table_id resb 8
-	.oem_revision resb 4
-	.creator_id resb 4
-	.creator_revision resb 4
-	.apic_address resb 4
+	.oem_id    resb 6
+	.oem_table_id   resb 8
+	.oem_revision   resb 4
+	.creator_id   resb 4
+	.creator_revision  resb 4
+	.apic_address   resb 4
 	.flags     resb 4
 
 .SIZE:
@@ -63,8 +63,8 @@ struc      ACPI_STRUCTURE_RSDP
 	struc   ACPI_STRUCTURE_MADT_APIC
 	.type   resb 1
 	.length resb 1
-	.cpu_id resb 1
-	.apic_id resb 1
+	.cpu_id    resb 1
+	.apic_id   resb 1
 	.flags  resb 4
 
 .SIZE:
@@ -73,9 +73,9 @@ struc      ACPI_STRUCTURE_RSDP
 	struc     ACPI_STRUCTURE_MADT_IOAPIC
 	.type     resb 1
 	.length   resb 1
-	.ioapic_id resb 1
+	.ioapic_id   resb 1
 	.reserved resb 1
-	.base_address resb 4
+	.base_address   resb 4
 	.gsib     resb 4
 
 .SIZE:
@@ -84,8 +84,8 @@ struc      ACPI_STRUCTURE_RSDP
 	struc   ACPI_STRUCTURE_MADT_ISO
 	.type   resb 1
 	.length resb 1
-	.bus_source resb 1
-	.irq_source resb 1
+	.bus_source   resb 1
+	.irq_source   resb 1
 	.gsi    resb 4
 	.flags  resb 2
 
@@ -95,7 +95,7 @@ struc      ACPI_STRUCTURE_RSDP
 	struc   ACPI_STRUCTURE_MADT_NMI
 	.type   resb 1
 	.length resb 1
-	.acpi_id resb 1
+	.acpi_id   resb 1
 	.flags  resb 2
 	.lint   resb 1
 

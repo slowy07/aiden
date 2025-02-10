@@ -26,4 +26,3 @@ include_string_digits:
 
 	ret
 
-macro_debug "include_string_digits"

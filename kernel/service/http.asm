@@ -1,14 +1,14 @@
-%define SERVICE_HTTP_version "0"
-%define SERVICE_HTTP_revision "8"
+%define SERVICE_HTTP_version "1"
+%define SERVICE_HTTP_revision "0"
 
 	%MACRO service_http_macro_foot 0
 	db     "<hr />", STATIC_ASCII_NEW_LINE
-	db     "Aiden Operating system v", KERNEL_version, ".", KERNEL_revision, " (HTTP Service v", SERVICE_HTTP_version, ".", SERVICE_HTTP_revision, ")"
+	db     "Aiden Operating System v", KERNEL_version, ".", KERNEL_revision, " (HTTP Service v", SERVICE_HTTP_version, ".", SERVICE_HTTP_revision, ")"
 	db     "<style>* { font: 12px/150% 'Courier New', 'DejaVu Sans Mono', Monospace, Verdana;color: #F5F5F5;} body { background-color: #282922;}</style>", STATIC_ASCII_NEW_LINE
 	%ENDMACRO
 
 service_http_ipc_message:
-	times KERNEL_IPC_STRUCTURE_LIST.SIZE db STATIC_EMPTY
+	times KERNEL_IPC_STRUCTURE.SIZE db STATIC_EMPTY
 
 service_http:
 	mov  cx, 80
@@ -20,10 +20,10 @@ service_http:
 	call kernel_ipc_receive
 	jc   .loop
 
-	mov rbx, qword [rdi + KERNEL_IPC_STRUCTURE_LIST.other]
+	mov rbx, qword [rdi + KERNEL_IPC_STRUCTURE.other]
 
 	mov  ecx, service_http_get_root_end - service_http_get_root
-	mov  rsi, qword [rdi + KERNEL_IPC_STRUCTURE_LIST.pointer]
+	mov  rsi, qword [rdi + KERNEL_IPC_STRUCTURE.pointer]
 	mov  rdi, service_http_get_root
 	call include_string_compare
 	jc   .no

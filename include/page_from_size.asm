@@ -14,5 +14,3 @@ include_page_from_size:
 	add rsp, STATIC_QWORD_SIZE_byte
 
 	ret
-
-macro_debug "include_page_from_size"

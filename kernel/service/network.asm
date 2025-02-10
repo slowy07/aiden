@@ -9,7 +9,7 @@ service_network:
 	xor ebp, ebp
 
 	call kernel_task_active
-	mov  rax, qword [rdi + KERNEL_STRUCTURE_TASK.pid]
+	mov  rax, qword [rdi + KERNEL_TASK_STRUCTURE.pid]
 
 	mov qword [service_network_pid], rax
 
@@ -18,8 +18,8 @@ service_network:
 	call kernel_ipc_receive
 	jc   .loop
 
-	mov rcx, qword [rdi + KERNEL_IPC_STRUCTURE_LIST.size]
-	mov rsi, qword [rdi + KERNEL_IPC_STRUCTURE_LIST.pointer]
+	mov rcx, qword [rdi + KERNEL_IPC_STRUCTURE.size]
+	mov rsi, qword [rdi + KERNEL_IPC_STRUCTURE.pointer]
 
 	cmp word [rsi + SERVICE_NETWORK_STRUCTURE_FRAME_ETHERNET.type], SERVICE_NETWORK_FRAME_ETHERNET_TYPE_arp
 	je  service_network_arp

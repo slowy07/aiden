@@ -24,6 +24,7 @@ kernel_init_memory:
 	je  .found
 
 	add ebx, KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP.SIZE
+
 	sub ecx, KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP.SIZE
 	jnz .search
 
@@ -43,7 +44,8 @@ kernel_init_memory:
 
 	mov qword [kernel_memory_map_address], rdi
 
-	shr  rcx, STATIC_DIVIDE_BY_8_shift
+	shr rcx, STATIC_DIVIDE_BY_8_shift
+
 	push rcx
 
 	call include_page_from_size
@@ -61,7 +63,8 @@ kernel_init_memory:
 	shr  rdi, STATIC_DIVIDE_BY_PAGE_shift
 
 	mov  rcx, rdi
-	call kernel_memory_alloc
+	mov  rsi, qword [kernel_memory_map_address]
+	call kernel_memory_secure
 
 	mov  ecx, kernel_init_string_memory_size_end - kernel_init_string_memory_size
 	mov  rsi, kernel_init_string_memory_size

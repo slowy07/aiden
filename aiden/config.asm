@@ -34,8 +34,8 @@ STATIC_MULTIBOOT_HEADER_FLAG_video equ 1 << 12
 struc         STATIC_MULTIBOOT_header
 .flags        resb 4
 .unsupported0 resb 40
-.mmap_length resb 4
-.mmap_addr resb 4
+.mmap_length  resb 4
+.mmap_addr  resb 4
 .unsupported1 resb 36
 .framebuffer_addr resb 8
 .framebuffer_pitch resb 4
@@ -43,55 +43,55 @@ struc         STATIC_MULTIBOOT_header
 .framebuffer_height resb 4
 .framebuffer_bpp resb 1
 .framebuffer_type resb 1
-.color_info resb 6
+.color_info  resb 6
 endstruc
 
 struc         STATIC_AIDEN_VIDEO_STRUCTURE_VGA_INFO_BLOCK
-.vesa_signature resb 4
-.vesa_version resb 2
-.oem_string_ptr resb 4
+.vesa_signature   resb 4
+.vesa_version   resb 2
+.oem_string_ptr   resb 4
 .capabilities resb 4
-.video_mode_ptr resb 4
-.total_memory resb 2
+.video_mode_ptr   resb 4
+.total_memory   resb 2
 .reserved     resb 236
 
 .SIZE:
 	endstruc
 
 	struc      STATIC_AIDEN_VIDEO_STRUCTURE_MODE_INFO_BLOCK
-	.mode_attributes resb 2
-	.win_a_attributes resb 1
-	.win_b_attributes resb 1
-	.win_granularity resb 2
-	.win_size resb 2
-	.win_a_segment resb 2
-	.win_b_segment resb 2
-	.win_func_ptr resb 4
-	.bytes_per_scanline resb 2
-	.x_resolution resb 2
-	.y_resolution resb 2
-	.x_char_size resb 1
-	.y_char_size resb 1
-	.number_of_planes resb 1
-	.bits_per_pixel resb 1
-	.number_of_banks resb 1
-	.memory_model resb 1
-	.bank_size resb 1
-	.number_of_image_pages resb 1
+	.mode_attributes  resb 2
+	.win_a_attributes  resb 1
+	.win_b_attributes  resb 1
+	.win_granularity  resb 2
+	.win_size   resb 2
+	.win_a_segment   resb 2
+	.win_b_segment   resb 2
+	.win_func_ptr   resb 4
+	.bytes_per_scanline  resb 2
+	.x_resolution   resb 2
+	.y_resolution   resb 2
+	.x_char_size   resb 1
+	.y_char_size   resb 1
+	.number_of_planes  resb 1
+	.bits_per_pixel   resb 1
+	.number_of_banks  resb 1
+	.memory_model   resb 1
+	.bank_size   resb 1
+	.number_of_image_pages  resb 1
 	.reserved0 resb 1
-	.red_mask_size resb 1
-	.red_field_position resb 1
-	.green_mask_size resb 1
-	.green_field_position resb 1
-	.blue_mask_size resb 1
-	.blue_field_position resb 1
-	.rsvd_mask_size resb 1
-	.direct_color_mode_info resb 2
-	.physical_base_address resb 4
+	.red_mask_size   resb 1
+	.red_field_position  resb 1
+	.green_mask_size  resb 1
+	.green_field_position  resb 1
+	.blue_mask_size   resb 1
+	.blue_field_position  resb 1
+	.rsvd_mask_size   resb 1
+	.direct_color_mode_info  resb 2
+	.physical_base_address  resb 4
 	.reserved1 resb 212
 	endstruc
 
-	DRIVER_PIT_PORT_command equ 0x0043
+	DRIVER_PIT_PORT_command   equ 0x0043
 
-	DRIVER_PIC_PORT_MASTER_data equ 0x0021
-	DRIVER_PIC_PORT_SLAVE_data equ 0x00A1
+	DRIVER_PIC_PORT_MASTER_data  equ 0x0021
+	DRIVER_PIC_PORT_SLAVE_data  equ 0x00A1

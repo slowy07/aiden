@@ -30,4 +30,3 @@ include_string_compare:
 
 	ret
 
-macro_debug "include_string_compare"

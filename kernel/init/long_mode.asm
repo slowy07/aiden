@@ -9,11 +9,10 @@ KERNEL_INIT_LONG_MODE_PAGE_FLAG_2MiB_size equ 10000000b
 KERNEL_INIT_LONG_MODE_PAGE_FLAG_default equ KERNEL_INIT_LONG_MODE_PAGE_FLAG_available | KERNEL_INIT_LONG_MODE_PAGE_FLAG_writeable
 
 	[BITS 32]
-
-	xor eax, eax
-	mov ecx, (KERNEL_INIT_LONG_MODE_PAGE_SIZE_4KiB_byte * 0x06) / 0x04
-	mov edi, KERNEL_INIT_LONG_MODE_PML4_TABLE_address
-	rep stosd
+	xor   eax, eax
+	mov   ecx, (KERNEL_INIT_LONG_MODE_PAGE_SIZE_4KiB_byte * 0x06) / 0x04
+	mov   edi, KERNEL_INIT_LONG_MODE_PML4_TABLE_address
+	rep   stosd
 
 	mov dword [KERNEL_INIT_LONG_MODE_PML4_TABLE_address], KERNEL_INIT_LONG_MODE_PML4_TABLE_address + KERNEL_INIT_LONG_MODE_PAGE_SIZE_4KiB_byte + KERNEL_INIT_LONG_MODE_PAGE_FLAG_default
 
@@ -28,8 +27,11 @@ KERNEL_INIT_LONG_MODE_PAGE_FLAG_default equ KERNEL_INIT_LONG_MODE_PAGE_FLAG_avai
 
 .next:
 	stosd
+
 	add edi, 0x04
+
 	add eax, KERNEL_INIT_LONG_MODE_PAGE_SIZE_2MiB_byte
+
 	dec ecx
 	jnz .next
 

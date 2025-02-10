@@ -63,4 +63,3 @@ include_string_trim:
 
 	ret
 
-macro_debug "include_string_trim"

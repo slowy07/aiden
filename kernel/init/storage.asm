@@ -2,6 +2,7 @@ kernel_init_storage:
 	mov  eax, DRIVER_PCI_CLASS_SUBCLASS_ide
 	call driver_pci_find_class_and_subclass
 	jc   .ide_end
+
 	call driver_ide_init
 
 	cmp byte [driver_ide_devices_count], STATIC_EMPTY
@@ -62,6 +63,7 @@ kernel_init_storage:
 
 .ide_next:
 	inc byte [kernel_init_string_storage_ide_hd_letter]
+
 	add rdi, DRIVER_IDE_STRUCTURE_DEVICE.SIZE
 
 	dec cl

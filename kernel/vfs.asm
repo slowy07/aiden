@@ -1,47 +1,47 @@
-KERNEL_VFS_FILE_TYPE_socket               equ 01000000b
-KERNEL_VFS_FILE_TYPE_symbolic_link        equ 00100000b
-KERNEL_VFS_FILE_TYPE_regular_file         equ 00010000b
-KERNEL_VFS_FILE_TYPE_block_device         equ 00001000b
-KERNEL_VFS_FILE_TYPE_directory            equ 00000100b
-KERNEL_VFS_FILE_TYPE_character_device     equ 00000010b
-KERNEL_VFS_FILE_TYPE_fifo                 equ 00000001b
+KERNEL_VFS_FILE_TYPE_socket equ 01000000b
+KERNEL_VFS_FILE_TYPE_symbolic_link equ 00100000b
+KERNEL_VFS_FILE_TYPE_regular_file equ 00010000b
+KERNEL_VFS_FILE_TYPE_block_device equ 00001000b
+KERNEL_VFS_FILE_TYPE_directory equ 00000100b
+KERNEL_VFS_FILE_TYPE_character_device equ 00000010b
+KERNEL_VFS_FILE_TYPE_fifo equ 00000001b
 KERNEL_VFS_FILE_TYPE_character_device_bit equ 1
-KERNEL_VFS_FILE_TYPE_directory_bit        equ 2
-KERNEL_VFS_FILE_TYPE_block_device_bit     equ 3
-KERNEL_VFS_FILE_TYPE_regular_file_bit     equ 4
-KERNEL_VFS_FILE_TYPE_symbolic_link_bit    equ 5
+KERNEL_VFS_FILE_TYPE_directory_bit equ 2
+KERNEL_VFS_FILE_TYPE_block_device_bit equ 3
+KERNEL_VFS_FILE_TYPE_regular_file_bit equ 4
+KERNEL_VFS_FILE_TYPE_symbolic_link_bit equ 5
 
-KERNEL_VFS_FILE_MODE_suid                 equ 0000100000000000b
-KERNEL_VFS_FILE_MODE_sgid                 equ 0000010000000000b
-KERNEL_VFS_FILE_MODE_sticky               equ 0000001000000000b
-KERNEL_VFS_FILE_MODE_USER_read            equ 0000000100000000b
-KERNEL_VFS_FILE_MODE_USER_write           equ 0000000010000000b
+KERNEL_VFS_FILE_MODE_suid equ 0000100000000000b
+KERNEL_VFS_FILE_MODE_sgid equ 0000010000000000b
+KERNEL_VFS_FILE_MODE_sticky equ 0000001000000000b
+KERNEL_VFS_FILE_MODE_USER_read equ 0000000100000000b
+KERNEL_VFS_FILE_MODE_USER_write equ 0000000010000000b
 KERNEL_VFS_FILE_MODE_USER_execute_or_traverse equ 0000000001000000b
-KERNEL_VFS_FILE_MODE_USER_full_control    equ 0000000111000000b
-KERNEL_VFS_FILE_MODE_GROUP_read           equ 0000000000100000b
-KERNEL_VFS_FILE_MODE_GROUP_write          equ 0000000000010000b
+KERNEL_VFS_FILE_MODE_USER_full_control equ 0000000111000000b
+KERNEL_VFS_FILE_MODE_GROUP_read equ 0000000000100000b
+KERNEL_VFS_FILE_MODE_GROUP_write equ 0000000000010000b
 KERNEL_VFS_FILE_MODE_GROUP_execute_or_traverse equ 0000000000001000b
-KERNEL_VFS_FILE_MODE_GROUP_full_control   equ 0000000000111000b
-KERNEL_VFS_FILE_MODE_OTHER_read           equ 0000000000000100b
-KERNEL_VFS_FILE_MODE_OTHER_write          equ 0000000000000010b
+KERNEL_VFS_FILE_MODE_GROUP_full_control equ 0000000000111000b
+KERNEL_VFS_FILE_MODE_OTHER_read equ 0000000000000100b
+KERNEL_VFS_FILE_MODE_OTHER_write equ 0000000000000010b
 KERNEL_VFS_FILE_MODE_OTHER_execute_or_traverse equ 0000000000000001b
-KERNEL_VFS_FILE_MODE_OTHER_full_control   equ 0000000000000111b
-KERNEL_VFS_FILE_MODE_UNKNOWN_execute      equ KERNEL_VFS_FILE_MODE_USER_execute_or_traverse | KERNEL_VFS_FILE_MODE_GROUP_execute_or_traverse | KERNEL_VFS_FILE_MODE_OTHER_execute_or_traverse
+KERNEL_VFS_FILE_MODE_OTHER_full_control equ 0000000000000111b
+KERNEL_VFS_FILE_MODE_UNKNOWN_execute equ KERNEL_VFS_FILE_MODE_USER_execute_or_traverse | KERNEL_VFS_FILE_MODE_GROUP_execute_or_traverse | KERNEL_VFS_FILE_MODE_OTHER_execute_or_traverse
 
-KERNEL_VFS_FILE_FLAGS_save                equ 00000001b
-KERNEL_VFS_FILE_FLAGS_reserved            equ 00000010b
+KERNEL_VFS_FILE_FLAGS_save equ 00000001b
+KERNEL_VFS_FILE_FLAGS_reserved equ 00000010b
 
-KERNEL_VFS_FILE_FLAGS_SAVE_bit            equ 0
-KERNEL_VFS_FILE_FLAGS_reserved_bit        equ 1
+KERNEL_VFS_FILE_FLAGS_SAVE_bit equ 0
+KERNEL_VFS_FILE_FLAGS_reserved_bit equ 1
 
-KERNEL_VFS_ERROR_FILE_exists              equ 0x01
-KERNEL_VFS_ERROR_DIRECTORY_full           equ 0x02
-KERNEL_VFS_ERROR_FILE_not_exists          equ 0x03
-KERNEL_VFS_ERROR_FILE_name_long           equ 0x04
-KERNEL_VFS_ERROR_FILE_name_short          equ 0x05
-KERNEL_VFS_ERROR_FILE_low_memory          equ 0x06
-KERNEL_VFS_ERROR_FILE_overflow            equ 0x07
-KERNEL_VFS_ERROR_FILE_no_directory        equ 0x08
+KERNEL_VFS_ERROR_FILE_exists equ 0x01
+KERNEL_VFS_ERROR_DIRECTORY_full equ 0x02
+KERNEL_VFS_ERROR_FILE_not_exists equ 0x03
+KERNEL_VFS_ERROR_FILE_name_long equ 0x04
+KERNEL_VFS_ERROR_FILE_name_short equ 0x05
+KERNEL_VFS_ERROR_FILE_low_memory equ 0x06
+KERNEL_VFS_ERROR_FILE_overflow equ 0x07
+KERNEL_VFS_ERROR_FILE_no_directory equ 0x08
 
 struc KERNEL_VFS_STRUCTURE_MAGICKNOT
 .root resb 8
@@ -49,25 +49,22 @@ struc KERNEL_VFS_STRUCTURE_MAGICKNOT
 endstruc
 
 struc   KERNEL_VFS_STRUCTURE_KNOT
-.id_or_data resb 8
+.id_or_data     resb 8
 .size   resb 8
-.owner  resb 2
-.group  resb 2
-.mode   resb 2
 .type   resb 1
 .flags  resb 2
-.time_modified resb 8
+.time_modified     resb 8
 .length resb 1
-.name   resb 16
+.name   resb 255
 
 .SIZE:
 	endstruc
 
-	kernel_vfs_semaphore db STATIC_FALSE
+	kernel_vfs_semaphore     db STATIC_FALSE
 
-	kernel_vfs_magicknot dq STATIC_EMPTY
+	kernel_vfs_magicknot     dq STATIC_EMPTY
 
-	kernel_vfs_string_directory_local db "."
+	kernel_vfs_string_directory_local   db "."
 
 kernel_vfs_string_directory_local_end:
 
@@ -78,9 +75,6 @@ kernel_vfs_dir_symlinks:
 	mov rbx, qword [rdi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
 	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], rdi
-
-	; FIXME: something wrong this code
-	; mov word [rbx + KERNEL_VFS_STRUCTURE_KNOT.mode], KERNEL_VFS_FILE_MODE_USER_full_control | KERNEL_VFS_FILE_MODE_GROUP_execute_or_traverse | KERNEL_VFS_FILE_MODE_OTHER_execute_or_traverse
 
 	mov word [rbx + KERNEL_VFS_STRUCTURE_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link
 
@@ -94,9 +88,6 @@ kernel_vfs_dir_symlinks:
 	add rbx, KERNEL_VFS_STRUCTURE_KNOT.SIZE
 
 	mov qword [rbx + KERNEL_VFS_STRUCTURE_KNOT.id_or_data], rsi
-
-	; FIXME: something wrong this code
-	; mov word [rbx + KERNEL_STRUCTURE_VFS_KNOT.mode], KERNEL_VFS_FILE_MODE_USER_full_control | KERNEL_VFS_FILE_MODE_GROUP_execute_or_traverse | KERNEL_VFS_FILE_MODE_OTHER_execute_or_traverse
 
 	mov word [rbx + KERNEL_VFS_STRUCTURE_KNOT.type], KERNEL_VFS_FILE_TYPE_symbolic_link
 
@@ -135,7 +126,7 @@ kernel_vfs_path_resolve:
 
 	call kernel_task_active
 
-	mov rdi, qword [rdi + KERNEL_STRUCTURE_TASK.knot]
+	mov rdi, qword [rdi + KERNEL_TASK_STRUCTURE.knot]
 
 	jmp .suffix
 
@@ -247,6 +238,8 @@ kernel_vfs_path_resolve:
 
 	ret
 
+macro_debug "kernel_vfs_path_resolve"
+
 kernel_vfs_file_touch:
 	push rcx
 	push rsi
@@ -320,6 +313,8 @@ kernel_vfs_file_touch:
 
 	ret
 
+macro_debug "kernel_vfs_file_touch"
+
 kernel_vfs_file_find:
 	push rax
 	push rcx
@@ -375,10 +370,12 @@ kernel_vfs_file_find:
 
 	ret
 
+macro_debug "kernel_vfs_file_find"
+
 kernel_vfs_knot_prepare:
 	push rcx
 
-	macro_close kernel_vfs_semaphore, 0
+	macro_lock kernel_vfs_semaphore, 0
 
 	mov rdi, qword [rdi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
@@ -421,6 +418,8 @@ kernel_vfs_knot_prepare:
 	pop rcx
 
 	ret
+
+macro_debug "kernel_vfs_knot_prepare"
 
 kernel_vfs_file_write:
 	push rax
@@ -525,6 +524,8 @@ kernel_vfs_file_write:
 
 	ret
 
+macro_debug "kernel_vfs_file_write"
+
 kernel_vfs_file_append:
 	push rax
 	push rbx
@@ -627,6 +628,8 @@ kernel_vfs_file_append:
 
 	ret
 
+macro_debug "kernel_vfs_file_append"
+
 kernel_vfs_file_read:
 	push rax
 	push rdx
@@ -638,10 +641,12 @@ kernel_vfs_file_read:
 	jnc .file
 
 	mov rsi, qword [rsi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
+
 	jmp .symbolic_link
 
 .file:
 	mov rax, qword [rsi + KERNEL_VFS_STRUCTURE_KNOT.size]
+
 	bt  word [rsi + KERNEL_VFS_STRUCTURE_KNOT.type], KERNEL_VFS_FILE_TYPE_directory_bit
 	jnc .regular_file
 
@@ -650,28 +655,35 @@ kernel_vfs_file_read:
 
 .regular_file:
 	push rax
-	mov  rsi, qword [rsi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
+
+	mov rsi, qword [rsi + KERNEL_VFS_STRUCTURE_KNOT.id_or_data]
 
 .loop:
 	mov rcx, STATIC_STRUCTURE_BLOCK.link
+
 	cmp rax, rcx
 	ja  .next_block
 
 	mov rcx, rax
 
 .next_block:
-	sub  rax, rcx
-	rep  movsb
-	and  si, KERNEL_PAGE_mask
-	mov  rsi, qword [rsi + STATIC_STRUCTURE_BLOCK.link]
+	sub rax, rcx
+
+	rep movsb
+
+	and si, KERNEL_PAGE_mask
+	mov rsi, qword [rsi + STATIC_STRUCTURE_BLOCK.link]
+
 	test rax, rax
 	jnz  .loop
 
 	pop rcx
+
 	pop rdi
 	pop rsi
 	pop rdx
 	pop rax
+
 	ret
 
 macro_debug "kernel_vfs_file_read"

@@ -5,10 +5,10 @@ endstruc
 
 struc KERNEL_STRUCTURE_GDT
 .null resb 8
-.cs_ring0 resb 8
-.ds_ring0 resb 8
-.cs_ring3 resb 8
-.ds_ring3 resb 8
+.cs_ring0     resb 8
+.ds_ring0     resb 8
+.cs_ring3     resb 8
+.ds_ring3     resb 8
 .tss  resb 8
 
 .SIZE:

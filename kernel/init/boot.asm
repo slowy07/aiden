@@ -1,5 +1,6 @@
 	[BITS 16]
-	[ORG  0x8000]
+
+	[ORG 0x8000]
 
 boot:
 	cli

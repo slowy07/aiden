@@ -13,4 +13,3 @@ include_page_align_up:
 
 	ret
 
-macro_debug "include_page_align_up"

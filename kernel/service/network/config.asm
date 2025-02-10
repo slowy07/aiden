@@ -1,5 +1,4 @@
 SERVICE_NETWORK_MAC_mask equ 0x0000FFFFFFFFFFFF
-
 SERVICE_NETWORK_PORT_SIZE_page equ 0x01
 SERVICE_NETWORK_PORT_FLAG_empty equ 000000001b
 SERVICE_NETWORK_PORT_FLAG_received equ 000000010b
@@ -7,20 +6,16 @@ SERVICE_NETWORK_PORT_FLAG_send equ 000000100b
 SERVICE_NETWORK_PORT_FLAG_BIT_empty equ 0
 SERVICE_NETWORK_PORT_FLAG_BIT_received equ 1
 SERVICE_NETWORK_PORT_FLAG_BIT_send equ 2
-
 SERVICE_NETWORK_STACK_SIZE_page equ 0x01
 SERVICE_NETWORK_STACK_FLAG_busy equ 10000000b
-
 SERVICE_NETWORK_FRAME_ETHERNET_TYPE_arp equ 0x0608
 SERVICE_NETWORK_FRAME_ETHERNET_TYPE_ip equ 0x0008
-
 SERVICE_NETWORK_FRAME_ARP_HTYPE_ethernet equ 0x0100
 SERVICE_NETWORK_FRAME_ARP_PTYPE_ipv4 equ 0x0008
 SERVICE_NETWORK_FRAME_ARP_HAL_mac equ 0x06
 SERVICE_NETWORK_FRAME_ARP_PAL_ipv4 equ 0x04
 SERVICE_NETWORK_FRAME_ARP_OPCODE_request equ 0x0100
 SERVICE_NETWORK_FRAME_ARP_OPCODE_answer equ 0x0200
-
 SERVICE_NETWORK_FRAME_IP_HEADER_LENGTH_default equ 0x05
 SERVICE_NETWORK_FRAME_IP_HEADER_LENGTH_mask equ 0x0F
 SERVICE_NETWORK_FRAME_IP_VERSION_mask equ 0xF0
@@ -30,10 +25,8 @@ SERVICE_NETWORK_FRAME_IP_PROTOCOL_TCP equ 0x06
 SERVICE_NETWORK_FRAME_IP_PROTOCOL_UDP equ 0x11
 SERVICE_NETWORK_FRAME_IP_TTL_default equ 0x40
 SERVICE_NETWORK_FRAME_IP_F_AND_F_do_not_fragment equ 0x0040
-
 SERVICE_NETWORK_FRAME_ICMP_TYPE_REQUEST equ 0x08
 SERVICE_NETWORK_FRAME_ICMP_TYPE_REPLY equ 0x00
-
 SERVICE_NETWORK_FRAME_TCP_HEADER_LENGTH_default equ 0x50
 SERVICE_NETWORK_FRAME_TCP_FLAGS_fin equ 0000000000000001b
 SERVICE_NETWORK_FRAME_TCP_FLAGS_syn equ 0000000000000010b
@@ -82,16 +75,16 @@ SERVICE_NETWORK_FRAME_TCP_WINDOW_SIZE_default equ 0x05B4
 	endstruc
 
 	struc           SERVICE_NETWORK_STRUCTURE_FRAME_IP
-	.version_and_ihl resb 0x01
-	.dscp_and_ecn resb 0x01
-	.total_length resb 0x02
+	.version_and_ihl    resb 0x01
+	.dscp_and_ecn     resb 0x01
+	.total_length     resb 0x02
 	.identification resb 0x02
-	.f_and_f resb 0x02
+	.f_and_f     resb 0x02
 	.ttl            resb 0x01
 	.protocol       resb 0x01
 	.checksum       resb 0x02
-	.source_address resb 0x04
-	.destination_address resb 0x04
+	.source_address     resb 0x04
+	.destination_address    resb 0x04
 
 .SIZE:
 	endstruc
@@ -107,8 +100,8 @@ SERVICE_NETWORK_FRAME_TCP_WINDOW_SIZE_default equ 0x05B4
 	endstruc
 
 	struc     SERVICE_NETWORK_STRUCTURE_FRAME_UDP
-	.port_source resb 0x02
-	.port_target resb 0x02
+	.port_source     resb 0x02
+	.port_target     resb 0x02
 	.length   resb 0x02
 	.checksum resb 0x02
 
@@ -116,44 +109,44 @@ SERVICE_NETWORK_FRAME_TCP_WINDOW_SIZE_default equ 0x05B4
 	endstruc
 
 	struc            SERVICE_NETWORK_STRUCTURE_FRAME_TCP
-	.port_source resb 0x02
-	.port_target resb 0x02
+	.port_source     resb 0x02
+	.port_target     resb 0x02
 	.sequence        resb 0x04
 	.acknowledgement resb 0x04
-	.header_length resb 0x01
+	.header_length     resb 0x01
 	.flags           resb 0x01
-	.window_size resb 0x02
+	.window_size     resb 0x02
 
 .checksum_and_urgent_pointer:
 	.checksum resb 0x02
-	.urgent_pointer resb 0x02
+	.urgent_pointer     resb 0x02
 
 .SIZE:
 .options:
 	endstruc
 
 	struc     SERVICE_NETWORK_STRUCTURE_FRAME_TCP_PSEUDO_HEADER
-	.source_ipv4 resb 4
-	.target_ipv4 resb 4
+	.source_ipv4     resb 4
+	.target_ipv4     resb 4
 	.reserved resb 1
 	.protocol resb 1
-	.segment_length resb 2
+	.segment_length     resb 2
 
 .SIZE:
 	endstruc
 
 	struc           SERVICE_NETWORK_STRUCTURE_TCP_STACK
-	.source_mac resb 8
-	.source_ipv4 resb 4
-	.source_sequence resb 4
-	.host_sequence resb 4
-	.request_acknowledgement resb 4
-	.window_size resb 2
-	.source_port resb 2
-	.host_port resb 2
+	.source_mac     resb 8
+	.source_ipv4     resb 4
+	.source_sequence    resb 4
+	.host_sequence     resb 4
+	.request_acknowledgement   resb 4
+	.window_size     resb 2
+	.source_port     resb 2
+	.host_port     resb 2
 	.status         resb 2
 	.flags          resb 2
-	.flags_request resb 2
+	.flags_request     resb 2
 	.identification resb 2
 
 .SIZE:

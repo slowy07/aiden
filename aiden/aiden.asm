@@ -91,6 +91,7 @@ aiden:
 
 .next:
 	add esi, STATIC_WORD_SIZE_byte
+
 	jmp .loop
 
 .error:
@@ -149,8 +150,7 @@ aiden_ps2_keyboard_in:
 aiden_ps2_keyboard_out:
 	in   al, 0x64
 	test al, 1
-
-	jz aiden_ps2_keyboard_out
+	jz   aiden_ps2_keyboard_out
 
 	ret
 
@@ -211,8 +211,9 @@ aiden_header_gdt_32bit:
 	dw aiden_table_gdt_32bit_end - aiden_table_gdt_32bit - 0x01
 	dd aiden_table_gdt_32bit
 
-	times 436 - ($ - $$) db 0x00
-	db    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	times 436 - ( $ - $$ )  db 0x00
+
+	db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 	db 0x00
 	db 0x00, 0x00, 0x00
@@ -221,11 +222,10 @@ aiden_header_gdt_32bit:
 	dd (file_kernel_end - $$) / 512
 	dd (1048576 - (file_kernel_end - $$)) / 512
 
-	times 510 - ($ - $$) db STATIC_EMPTY
+	times 510 - ($ - $$)  db STATIC_EMPTY
 	dw    STATIC_AIDEN_magic
 
 file_kernel:
-
 	incbin "build/kernel"
 	align  STATIC_SECTOR_SIZE_byte
 

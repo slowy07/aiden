@@ -33,14 +33,14 @@ struc   DRIVER_RTC_STRUCTURE
 .day    resb 1
 .month  resb 1
 .year   resb 1
-.day_of_week resb 1
+.day_of_week     resb 1
 endstruc
 
-driver_rtc_semaphore db STATIC_FALSE
+driver_rtc_semaphore     db STATIC_FALSE
 
-driver_rtc_microtime dq STATIC_EMPTY
+driver_rtc_microtime     dq STATIC_EMPTY
 
-driver_rtc_date_and_time dq STATIC_EMPTY
+driver_rtc_date_and_time    dq STATIC_EMPTY
 
 driver_rtc:
 	push rax

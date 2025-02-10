@@ -7,8 +7,9 @@ include_input:
 	cmp rbx, STATIC_EMPTY
 	je  .loop
 
-	mov  rcx, rbx
-	call kernel_video_string
+	mov ax, KERNEL_SERVICE_VIDEO_string
+	mov rcx, rbx
+	int KERNEL_SERVICE
 
 	mov rcx, qword [rsp]
 
@@ -17,8 +18,9 @@ include_input:
 	add rsi, rbx
 
 .loop:
-	call driver_ps2_keyboard_read
-	jz   .loop
+	mov ax, KERNEL_SERVICE_KEYBOARD_key
+	int KERNEL_SERVICE
+	jz  .loop
 
 	cmp ax, STATIC_ASCII_BACKSPACE
 	je  .key_backspace
@@ -29,9 +31,9 @@ include_input:
 	cmp ax, STATIC_ASCII_ESCAPE
 	je  .empty
 
-	cmp rax, STATIC_ASCII_SPACE
+	cmp ax, STATIC_ASCII_SPACE
 	jb  .loop
-	cmp rax, STATIC_ASCII_TILDE
+	cmp ax, STATIC_ASCII_TILDE
 	ja  .loop
 
 	cmp rcx, STATIC_EMPTY
@@ -46,8 +48,10 @@ include_input:
 .print:
 	push rcx
 
-	mov  ecx, 0x01
-	call kernel_video_char
+	mov  edx, KERNEL_SERVICE_VIDEO_char
+	xchg dx, ax
+	mov  ecx, 1
+	int  KERNEL_SERVICE
 
 	pop rcx
 
@@ -83,5 +87,3 @@ include_input:
 	pop rax
 
 	ret
-
-macro_debug "include_input"

@@ -11,8 +11,8 @@ MULTIBOOT_HEADER_CHECKSUM equ -(MULTIBOOT_HEADER_FLAG_default + MULTIBOOT_HEADER
 struc         MULTIBOOT_HEADER
 .flags        resb 4
 .unsupported0 resb 40
-.mmap_length resb 4
-.mmap_addr resb 4
+.mmap_length  resb 4
+.mmap_addr  resb 4
 .unsupported1 resb 36
 .framebuffer_addr resb 8
 .framebuffer_pitch resb 4
@@ -20,7 +20,7 @@ struc         MULTIBOOT_HEADER
 .framebuffer_height resb 4
 .framebuffer_bpp resb 1
 .framebuffer_type resb 1
-.color_info resb 6
+.color_info  resb 6
 endstruc
 
 align 0x04

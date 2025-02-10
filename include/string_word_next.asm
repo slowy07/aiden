@@ -68,5 +68,3 @@ include_string_word_next:
 	pop rax
 
 	ret
-
-macro_debug "include_string_word_next"

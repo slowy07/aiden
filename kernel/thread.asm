@@ -20,7 +20,7 @@ kernel_thread:
 
 	mov rdi, qword [r8]
 	and di, KERNEL_PAGE_mask
-	add rdi, KERNEL_PAGE_SIZE_byte - (STATIC_QWORD_SIZE_byte * 0x05)
+	add rdi, KERNEL_PAGE_SIZE_byte - ( STATIC_QWORD_SIZE_byte * 0x05 )
 
 	mov rax, qword [rsp + STATIC_QWORD_SIZE_byte * 0x02]
 	stosq
@@ -56,3 +56,5 @@ kernel_thread:
 	pop rax
 
 	ret
+
+macro_debug "kernel_thread"

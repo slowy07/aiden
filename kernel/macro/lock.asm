@@ -1,4 +1,4 @@
-	%MACRO macro_close 2
+	%MACRO macro_lock 2
 	push   rax
 
 .1:

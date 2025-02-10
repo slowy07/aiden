@@ -13,9 +13,9 @@ DRIVER_IDE_REGISTER_sector_count_1 equ 0x0008
 DRIVER_IDE_REGISTER_lba3 equ 0x0009
 DRIVER_IDE_REGISTER_lba4 equ 0x000A
 DRIVER_IDE_REGISTER_lba5 equ 0x000B
-DRIVER_IDE_REGISTER_control_OR_alstatus equ 0x000C
+DRIVER_IDE_REGISTER_control_OR_altstatus equ 0x000C
 DRIVER_IDE_REGISTER_device_address equ 0x000D
-DRIVER_IDE_REGISTER_channel_control_OR_alstatus equ 0x0206
+DRIVER_IDE_REGISTER_channel_control_OR_altstatus equ 0x0206
 
 DRIVER_IDE_DRIVE_master equ 10100000b
 DRIVER_IDE_DRIVE_slave equ 10110000b
@@ -23,15 +23,17 @@ DRIVER_IDE_DRIVE_slave equ 10110000b
 DRIVER_IDE_CONTROL_nIEN equ 00000010b
 DRIVER_IDE_CONTROL_SRST equ 00000100b
 
-DRIVER_IDE_COMMAND_ATAPI_eject equ 0x01B
+DRIVER_IDE_COMMAND_ATAPI_eject equ 0x1B
 DRIVER_IDE_COMMAND_read_pio equ 0x20
 DRIVER_IDE_COMMAND_read_pio_extended equ 0x24
 DRIVER_IDE_COMMAND_read_dma_extended equ 0x25
 DRIVER_IDE_COMMAND_write_pio equ 0x30
+DRIVER_IDE_COMMAND_write_pio_extended equ 0x34
+DRIVER_IDE_COMMAND_write_dma_extended equ 0x35
 DRIVER_IDE_COMMAND_packet equ 0xA0
 DRIVER_IDE_COMMAND_identify_packet equ 0xA1
-DRIVER_IDE_COMMAND_ATAPI_read equ 0x0A8
-DRIVE_IDE_COMMAND_read_dma equ 0xC8
+DRIVER_IDE_COMMAND_ATAPI_read equ 0xA8
+DRIVER_IDE_COMMAND_read_dma equ 0xC8
 DRIVER_IDE_COMMAND_write_dma equ 0xCA
 DRIVER_IDE_COMMAND_cache_flush equ 0xE7
 DRIVER_IDE_COMMAND_cache_flush_extended equ 0xEA
@@ -59,6 +61,7 @@ DRIVER_IDE_STATUS_seek_complete equ 00010000b
 DRIVER_IDE_STATUS_write_fault equ 00100000b
 DRIVER_IDE_STATUS_ready equ 01000000b
 DRIVER_IDE_STATUS_busy equ 10000000b
+
 DRIVER_IDE_ERROR_no_address_mark equ 00000001b
 DRIVER_IDE_ERROR_track_0_not_found equ 00000010b
 DRIVER_IDE_ERROR_command_aborted equ 00000100b
@@ -71,12 +74,12 @@ DRIVER_IDE_ERROR_bad_block equ 10000000b
 struc    DRIVER_IDE_STRUCTURE_DEVICE
 .channel resb 2
 .drive   resb 1
-.size_sectors    resb 8
+.size_sectors     resb 8
 
 .SIZE:
 	endstruc
 
-	driver_ide_devices_count db STATIC_EMPTY
+	driver_ide_devices_count    db STATIC_EMPTY
 
 	align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
 
@@ -178,15 +181,15 @@ driver_ide_init:
 	call kernel_memory_alloc_page
 
 	mov al, DRIVER_IDE_CONTROL_nIEN
-	mov dx, DRIVER_IDE_CHANNEL_PRIMARY + DRIVER_IDE_REGISTER_channel_control_OR_alstatus
+	mov dx, DRIVER_IDE_CHANNEL_PRIMARY + DRIVER_IDE_REGISTER_channel_control_OR_altstatus
+	out dx, al
 
 	mov  dx, DRIVER_IDE_CHANNEL_PRIMARY
 	call driver_ide_pool
 	jc   .next
 
 	mov al, DRIVER_IDE_CONTROL_SRST
-	mov dx, DRIVER_IDE_CHANNEL_PRIMARY + DRIVER_IDE_REGISTER_channel_control_OR_alstatus
-
+	mov dx, DRIVER_IDE_CHANNEL_PRIMARY + DRIVER_IDE_REGISTER_channel_control_OR_altstatus
 	out dx, al
 
 	xor al, al
@@ -201,37 +204,11 @@ driver_ide_init:
 
 	mov  al, DRIVER_IDE_DRIVE_slave
 	mov  dx, DRIVER_IDE_CHANNEL_PRIMARY
-	call driver_ide_init_drive
-
-	out dx, al
-
-	mov  dx, DRIVER_IDE_CHANNEL_SECONDARY
-	call driver_ide_pool
-	jc   .end
-
-	mov  dx, DRIVER_IDE_CHANNEL_SECONDARY
-	call driver_ide_pool
-
-	mov al, DRIVER_IDE_CONTROL_SRST
-	mov dx, DRIVER_IDE_CHANNEL_SECONDARY + DRIVER_IDE_REGISTER_channel_control_OR_alstatus
-	out dx, al
-	xor al, al
-	out dx, al
-
-	mov  dx, DRIVER_IDE_CHANNEL_SECONDARY
-	call driver_ide_pool
-
-	mov  al, DRIVER_IDE_DRIVE_master
-	mov  dx, DRIVER_IDE_CHANNEL_SECONDARY
-	call driver_ide_init_drive
-
-	mov  al, DRIVER_IDE_DRIVE_slave
-	mov  dx, DRIVER_IDE_CHANNEL_SECONDARY
 	call driver_ide_init_drive
 
 .next:
 	mov al, DRIVER_IDE_CONTROL_nIEN
-	mov dx, DRIVER_IDE_CHANNEL_SECONDARY + DRIVER_IDE_REGISTER_channel_control_OR_alstatus
+	mov dx, DRIVER_IDE_CHANNEL_SECONDARY + DRIVER_IDE_REGISTER_channel_control_OR_altstatus
 	out dx, al
 
 	mov  dx, DRIVER_IDE_CHANNEL_SECONDARY
@@ -239,7 +216,7 @@ driver_ide_init:
 	jc   .end
 
 	mov al, DRIVER_IDE_CONTROL_SRST
-	mov dx, DRIVER_IDE_CHANNEL_SECONDARY + DRIVER_IDE_REGISTER_channel_control_OR_alstatus
+	mov dx, DRIVER_IDE_CHANNEL_SECONDARY + DRIVER_IDE_REGISTER_channel_control_OR_altstatus
 	out dx, al
 
 	xor al, al
@@ -269,7 +246,7 @@ driver_ide_pool:
 	push rax
 	push rdx
 
-	add dx, DRIVER_IDE_REGISTER_channel_control_OR_alstatus
+	add dx, DRIVER_IDE_REGISTER_channel_control_OR_altstatus
 	in  al, dx
 	in  al, dx
 	in  al, dx
@@ -283,6 +260,7 @@ driver_ide_pool:
 
 .error:
 	stc
+
 	jmp .end
 
 .wait:

@@ -7,8 +7,9 @@ kernel_panic:
 	lodsb
 
 	stosw
-
 	dec ecx
 	jnz .loop
 
 	jmp $
+
+macro_debug "kernel_panic"

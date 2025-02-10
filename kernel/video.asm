@@ -1,24 +1,20 @@
-KERNEL_VIDEO_DEPTH_shift            equ 2
-KERNEL_VIDEO_DEPTH_byte             equ 4
-KERNEL_VIDEO_DEPTH_bit              equ 32
+kernel_video_semaphore db STATIC_FALSE
+kernel_video_base_address dq STATIC_EMPTY
+kernel_video_pointer dq STATIC_EMPTY
+kernel_video_framebuffer dq STATIC_EMPTY
+kernel_video_size_byte dq STATIC_EMPTY
+kernel_video_size_pixel dq STATIC_EMPTY
+kernel_video_width_pixel dq STATIC_EMPTY
+kernel_video_height_pixel dq STATIC_EMPTY
+kernel_video_width_char dq STATIC_EMPTY
+kernel_video_height_char dq STATIC_EMPTY
+kernel_video_scanline_byte dq STATIC_EMPTY
+kernel_video_scanline_char dq STATIC_EMPTY
 
-kernel_video_semaphore              db STATIC_FALSE
-kernel_video_base_address           dq STATIC_EMPTY
-kernel_video_pointer                dq STATIC_EMPTY
-kernel_video_framebuffer            dq STATIC_EMPTY
-kernel_video_size_byte              dq STATIC_EMPTY
-kernel_video_size_pixel             dq STATIC_EMPTY
-kernel_video_width_pixel            dq STATIC_EMPTY
-kernel_video_height_pixel           dq STATIC_EMPTY
-kernel_video_width_char             dq STATIC_EMPTY
-kernel_video_height_char            dq STATIC_EMPTY
-kernel_video_scanline_byte          dq STATIC_EMPTY
-kernel_video_scanline_char          dq STATIC_EMPTY
+kernel_video_color dd STATIC_COLOR_default
+kernel_video_color_background dd STATIC_COLOR_BACKGROUND_default
 
-kernel_video_color                  dd STATIC_COLOR_default
-kernel_video_color_background       dd STATIC_COLOR_BACKGROUND_default
-
-kernel_video_cursor_lock            dq STATIC_EMPTY
+kernel_video_cursor_lock dq STATIC_EMPTY
 
 kernel_video_cursor:
 .x:
@@ -27,41 +23,49 @@ kernel_video_cursor:
 .y:
 	dd STATIC_EMPTY
 
-	kernel_video_color_sequence_default     db STATIC_COLOR_ASCII_DEFAULT
-	kernel_video_color_sequence_black       db STATIC_COLOR_ASCII_BLACK
-	kernel_video_color_sequence_blue        db STATIC_COLOR_ASCII_BLUE
-	kernel_video_color_sequence_green       db STATIC_COLOR_ASCII_GREEN
-	kernel_video_color_sequence_cyan        db STATIC_COLOR_ASCII_CYAN
-	kernel_video_color_sequence_red         db STATIC_COLOR_ASCII_RED
-	kernel_video_color_sequence_magenta     db STATIC_COLOR_ASCII_MAGENTA
-	kernel_video_color_sequence_brown       db STATIC_COLOR_ASCII_BROWN
-	kernel_video_color_sequence_gray_light  db STATIC_COLOR_ASCII_GRAY_LIGHT
-	kernel_video_color_sequence_gray        db STATIC_COLOR_ASCII_GRAY
-	kernel_video_color_sequence_blue_light  db STATIC_COLOR_ASCII_BLUE_LIGHT
+	kernel_video_color_sequence_default db STATIC_COLOR_ASCII_DEFAULT
+	kernel_video_color_sequence_black db STATIC_COLOR_ASCII_BLACK
+	kernel_video_color_sequence_blue db STATIC_COLOR_ASCII_BLUE
+	kernel_video_color_sequence_green db STATIC_COLOR_ASCII_GREEN
+	kernel_video_color_sequence_cyan db STATIC_COLOR_ASCII_CYAN
+	kernel_video_color_sequence_red db STATIC_COLOR_ASCII_RED
+	kernel_video_color_sequence_magenta db STATIC_COLOR_ASCII_MAGENTA
+	kernel_video_color_sequence_brown db STATIC_COLOR_ASCII_BROWN
+	kernel_video_color_sequence_gray_light db STATIC_COLOR_ASCII_GRAY_LIGHT
+	kernel_video_color_sequence_gray db STATIC_COLOR_ASCII_GRAY
+	kernel_video_color_sequence_blue_light db STATIC_COLOR_ASCII_BLUE_LIGHT
 	kernel_video_color_sequence_green_light db STATIC_COLOR_ASCII_GREEN_LIGHT
-	kernel_video_color_sequence_cyan_light  db STATIC_COLOR_ASCII_CYAN_LIGHT
-	kernel_video_color_sequence_red_light   db STATIC_COLOR_ASCII_RED_LIGHT
+	kernel_video_color_sequence_cyan_light db STATIC_COLOR_ASCII_CYAN_LIGHT
+	kernel_video_color_sequence_red_light db STATIC_COLOR_ASCII_RED_LIGHT
 	kernel_video_color_sequence_magenta_light db STATIC_COLOR_ASCII_MAGENTA_LIGHT
-	kernel_video_color_sequence_yellow      db STATIC_COLOR_ASCII_YELLOW
-	kernel_video_color_sequence_white       db STATIC_COLOR_ASCII_WHITE
+	kernel_video_color_sequence_yellow db STATIC_COLOR_ASCII_YELLOW
+	kernel_video_color_sequence_white db STATIC_COLOR_ASCII_WHITE
 
 kernel_video_drain:
 	push rax
 	push rcx
 	push rdi
 
+	call kernel_video_cursor_disable
+
 	mov eax, dword [kernel_video_color_background]
 	mov rcx, qword [kernel_video_size_pixel]
 	mov rdi, qword [kernel_video_framebuffer]
 	rep stosd
 
-	mov  qword [kernel_video_cursor], STATIC_EMPTY
+	mov qword [kernel_video_cursor], STATIC_EMPTY
+
 	call kernel_video_cursor_set
+
+	call kernel_video_cursor_enable
 
 	pop rdi
 	pop rcx
 	pop rax
+
 	ret
+
+macro_debug "kernel_video_drain"
 
 kernel_video_matrix:
 	push rax
@@ -88,17 +92,19 @@ kernel_video_matrix:
 	jnc .continue
 
 	mov dword [rdi], r8d
+
 	mov dword [rdi + STATIC_DWORD_SIZE_byte], STATIC_EMPTY
 
 .continue:
 	add rdi, STATIC_DWORD_SIZE_byte
+
 	dec cl
 	jns .loop
-
 	sub rdi, KERNEL_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
 	add rdi, qword [kernel_video_scanline_byte]
 
 	inc rsi
+
 	dec bl
 	jnz .next
 
@@ -109,7 +115,10 @@ kernel_video_matrix:
 	pop rcx
 	pop rbx
 	pop rax
+
 	ret
+
+macro_debug "kernel_video_matrix"
 
 kernel_video_char_clean:
 	push rax
@@ -119,6 +128,7 @@ kernel_video_char_clean:
 	push rdi
 
 	mov ebx, KERNEL_FONT_HEIGHT_pixel
+
 	mov eax, dword [kernel_video_color_background]
 
 .next:
@@ -142,26 +152,38 @@ kernel_video_char_clean:
 	pop rcx
 	pop rbx
 	pop rax
+
 	ret
+
+macro_debug "kernel_video_char_clean"
 
 kernel_video_cursor_set:
 	push rax
 	push rcx
 	push rdx
 
-	mov eax, dword [kernel_video_cursor.y]
-	mul qword [kernel_video_scanline_char]
-	mov edx, dword [kernel_video_cursor.x]
-	shl rdx, KERNEL_VIDEO_DEPTH_shift
-	add rdx, rax
+	call kernel_video_cursor_disable
 
-	add rdx, qword [kernel_video_framebuffer]
-	mov qword [kernel_video_pointer], rdx
+	mov  eax, dword [kernel_video_cursor.y]
+	mul  qword [kernel_video_scanline_char]
+	push rax
+	mov  eax, dword [kernel_video_cursor.x]
+	mul  qword [kernel_font_width_byte]
+	add  qword [rsp], rax
+	pop  rax
+
+	add rax, qword [kernel_video_framebuffer]
+	mov qword [kernel_video_pointer], rax
+
+	call kernel_video_cursor_enable
 
 	pop rdx
 	pop rcx
 	pop rax
+
 	ret
+
+macro_debug "kernel_video_cursor_set"
 
 kernel_video_string:
 	push rax
@@ -194,6 +216,7 @@ kernel_video_string:
 	push rcx
 
 	dec rsi
+
 	mov ecx, STATIC_ASCII_SEQUENCE_length
 
 .default:
@@ -202,6 +225,7 @@ kernel_video_string:
 	jc   .black
 
 	mov dword [kernel_video_color], STATIC_COLOR_default
+
 	jmp .done
 
 .black:
@@ -210,6 +234,7 @@ kernel_video_string:
 	jc   .blue
 
 	mov dword [kernel_video_color], STATIC_COLOR_black
+
 	jmp .done
 
 .blue:
@@ -218,6 +243,7 @@ kernel_video_string:
 	jc   .green
 
 	mov dword [kernel_video_color], STATIC_COLOR_blue
+
 	jmp .done
 
 .green:
@@ -226,6 +252,7 @@ kernel_video_string:
 	jc   .cyan
 
 	mov dword [kernel_video_color], STATIC_COLOR_green
+
 	jmp .done
 
 .cyan:
@@ -234,6 +261,7 @@ kernel_video_string:
 	jc   .red
 
 	mov dword [kernel_video_color], STATIC_COLOR_cyan
+
 	jmp .done
 
 .red:
@@ -242,6 +270,7 @@ kernel_video_string:
 	jc   .magenta
 
 	mov dword [kernel_video_color], STATIC_COLOR_red
+
 	jmp .done
 
 .magenta:
@@ -250,6 +279,7 @@ kernel_video_string:
 	jc   .brown
 
 	mov dword [kernel_video_color], STATIC_COLOR_magenta
+
 	jmp .done
 
 .brown:
@@ -258,6 +288,7 @@ kernel_video_string:
 	jc   .gray_light
 
 	mov dword [kernel_video_color], STATIC_COLOR_brown
+
 	jmp .done
 
 .gray_light:
@@ -266,6 +297,7 @@ kernel_video_string:
 	jc   .gray
 
 	mov dword [kernel_video_color], STATIC_COLOR_gray_light
+
 	jmp .done
 
 .gray:
@@ -274,6 +306,7 @@ kernel_video_string:
 	jc   .blue_light
 
 	mov dword [kernel_video_color], STATIC_COLOR_gray
+
 	jmp .done
 
 .blue_light:
@@ -282,6 +315,7 @@ kernel_video_string:
 	jc   .green_light
 
 	mov dword [kernel_video_color], STATIC_COLOR_blue_light
+
 	jmp .done
 
 .green_light:
@@ -290,6 +324,7 @@ kernel_video_string:
 	jc   .cyan_light
 
 	mov dword [kernel_video_color], STATIC_COLOR_green_light
+
 	jmp .done
 
 .cyan_light:
@@ -298,6 +333,7 @@ kernel_video_string:
 	jc   .red_light
 
 	mov dword [kernel_video_color], STATIC_COLOR_cyan_light
+
 	jmp .done
 
 .red_light:
@@ -306,6 +342,7 @@ kernel_video_string:
 	jc   .magenta_light
 
 	mov dword [kernel_video_color], STATIC_COLOR_red_light
+
 	jmp .done
 
 .magenta_light:
@@ -314,6 +351,7 @@ kernel_video_string:
 	jc   .yellow
 
 	mov dword [kernel_video_color], STATIC_COLOR_magenta_light
+
 	jmp .done
 
 .yellow:
@@ -322,6 +360,7 @@ kernel_video_string:
 	jc   .white
 
 	mov dword [kernel_video_color], STATIC_COLOR_yellow
+
 	jmp .done
 
 .white:
@@ -339,13 +378,16 @@ kernel_video_string:
 	pop rcx
 	pop rsi
 	pop rdi
+
 	jnc .continue
 
 .no:
 	push rcx
+
 	mov  ecx, 1
 	call kernel_video_char
-	pop  rcx
+
+	pop rcx
 
 .continue:
 	dec rcx
@@ -353,12 +395,16 @@ kernel_video_string:
 
 .end:
 	call kernel_video_cursor_enable
-	pop  rsi
-	pop  rdx
-	pop  rcx
-	pop  rbx
-	pop  rax
+
+	pop rsi
+	pop rdx
+	pop rcx
+	pop rbx
+	pop rax
+
 	ret
+
+macro_debug "kernel_video_string"
 
 kernel_video_char:
 	push rax
@@ -368,10 +414,12 @@ kernel_video_char:
 	push rdi
 
 	call kernel_video_cursor_disable
-	macro_close kernel_video_semaphore, 0
+
+	macro_lock kernel_video_semaphore, 0
 
 	mov ebx, dword [kernel_video_cursor]
 	mov edx, dword [kernel_video_cursor + STATIC_DWORD_SIZE_byte]
+
 	mov rdi, qword [kernel_video_pointer]
 
 .loop:
@@ -382,44 +430,52 @@ kernel_video_char:
 	je  .backspace
 
 	call kernel_video_char_clean
+
 	sub  ax, STATIC_ASCII_SPACE
 	call kernel_video_matrix
 
 	inc ebx
+
 	add rdi, qword [kernel_font_width_byte]
 
 	cmp ebx, dword [kernel_video_width_char]
 	jb  .continue
 
-  push rax
-  push rdx
+	push rax
+	push rdx
 
-  mov rax, qword [kernel_font_width_byte]
-  mul rbx
-  sub rdi, rax
-  add rdi, qword [kernel_video_scanline_char]
+	mov rax, qword [kernel_font_width_byte]
+	mul rbx
+	sub rdi, rax
+	add rdi, qword [kernel_video_scanline_char]
 
-  pop rdx
-  pop rax
+	pop rdx
+	pop rax
 
+	xor ebx, ebx
 	inc edx
 
 .row:
 	cmp edx, dword [kernel_video_height_char]
 	jb  .continue
 
-	dec  edx
-	sub  rdi, qword [kernel_video_scanline_char]
+	dec edx
+
+	sub rdi, qword [kernel_video_scanline_char]
+
 	call kernel_video_scroll
 
 .continue:
 	dec rcx
 	jnz .loop
 
-	mov  dword [kernel_video_cursor], ebx
-	mov  dword [kernel_video_cursor + STATIC_DWORD_SIZE_byte], edx
-	mov  qword [kernel_video_pointer], rdi
-	mov  byte [kernel_video_semaphore], STATIC_FALSE
+	mov dword [kernel_video_cursor], ebx
+	mov dword [kernel_video_cursor + STATIC_DWORD_SIZE_byte], edx
+
+	mov qword [kernel_video_pointer], rdi
+
+	mov byte [kernel_video_semaphore], STATIC_FALSE
+
 	call kernel_video_cursor_enable
 
 	pop rdi
@@ -427,6 +483,7 @@ kernel_video_char:
 	pop rcx
 	pop rbx
 	pop rax
+
 	ret
 
 .new_line:
@@ -439,12 +496,14 @@ kernel_video_char:
 	sub rdi, rax
 
 	xor ebx, ebx
+
 	add rdi, qword [kernel_video_scanline_char]
 
 	pop rdx
 	inc rdx
 
 	pop rax
+
 	jmp .row
 
 .backspace:
@@ -452,33 +511,37 @@ kernel_video_char:
 	jz   .begin
 
 	dec ebx
+
 	jmp .clear
 
 .begin:
 	test edx, edx
+	jz   .continue
 
-  jz .continue
 	mov ebx, dword [kernel_video_width_char]
 	dec ebx
 
-  dec ebx
+	dec edx
 
-  push rax
-  push rdx
+	push rax
+	push rdx
 
-  sub rdi, qword [kernel_video_scanline_char]
-  mov rax, qword [kernel_font_width_byte]
+	sub rdi, qword [kernel_video_scanline_char]
+	mov rax, qword [kernel_font_width_byte]
+	mul dword [kernel_video_width_char]
+	add rdi, rax
 
-  mul qword [kernel_video_width_char]
-  add rdi, rax
-
-  pop rdx
-  pop rax
+	pop rdx
+	pop rax
 
 .clear:
-	sub  rdi, KERNEL_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
+	sub rdi, KERNEL_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
+
 	call kernel_video_char_clean
-	jmp  .continue
+
+	jmp .continue
+
+macro_debug "kernel_video_char"
 
 kernel_video_number:
 	push rax
@@ -488,6 +551,8 @@ kernel_video_number:
 	push r9
 
 	call kernel_video_cursor_disable
+
+	and ebx, STATIC_BYTE_mask
 
 	cmp bl, 2
 	jb  .error
@@ -555,6 +620,8 @@ kernel_video_number:
 
 	ret
 
+macro_debug "kernel_video_number"
+
 kernel_video_scroll:
 	push rcx
 	push rsi
@@ -581,6 +648,8 @@ kernel_video_scroll:
 	pop rcx
 
 	ret
+
+macro_debug "kernel_video_scroll"
 
 kernel_video_line_drain:
 	push rax
@@ -612,6 +681,8 @@ kernel_video_line_drain:
 
 	ret
 
+macro_debug "kernel_video_line_drain"
+
 kernel_video_cursor_disable:
 	inc qword [kernel_video_cursor_lock]
 
@@ -622,6 +693,8 @@ kernel_video_cursor_disable:
 
 .ready:
 	ret
+
+macro_debug "kernel_video_cursor_disable"
 
 kernel_video_cursor_enable:
 	cmp qword [kernel_video_cursor_lock], STATIC_EMPTY
@@ -636,6 +709,8 @@ kernel_video_cursor_enable:
 
 .ready:
 	ret
+
+macro_debug "kernel_video_cursor_enable"
 
 kernel_video_cursor_switch:
 	push rax
@@ -664,3 +739,5 @@ kernel_video_cursor_switch:
 	pop rax
 
 	ret
+
+macro_debug "kernel_video_cursor_switch"

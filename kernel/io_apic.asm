@@ -30,3 +30,5 @@ kernel_io_apic_connect:
 	pop rax
 
 	ret
+
+macro_debug "kernel_io_apic_connect"
