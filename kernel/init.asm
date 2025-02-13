@@ -14,7 +14,6 @@ je  .entry
 
 kernel_init:
 	%include "kernel/init/video.asm"
-	%include "kernel/init/font.asm"
 	%include "kernel/init/memory.asm"
 	%include "kernel/init/acpi.asm"
 	%include "kernel/init/page.asm"

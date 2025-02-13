@@ -89,47 +89,40 @@ kernel_init_vfs_directory_structure:
 	db STATIC_EMPTY
 
 kernel_init_vfs_files:
-	dq kernel_init_vfs_file_init
-	dq kernel_init_vfs_file_init_end - kernel_init_vfs_file_init
-	db 9
-	db "/bin/init"
+	;dq kernel_init_vfs_file_init
+	;dq kernel_init_vfs_file_init_end - kernel_init_vfs_file_init
+	;db 9
+	;db "/bin/init"
 
-	dq kernel_init_vfs_file_shell
-	dq kernel_init_vfs_file_shell_end - kernel_init_vfs_file_shell
-	db 10
-	db "/bin/shell"
+	;dq kernel_init_vfs_file_shell
+	;dq kernel_init_vfs_file_shell_end - kernel_init_vfs_file_shell
+	;db 10
+	;db "/bin/shell"
 
-	dq kernel_init_vfs_file_hello
-	dq kernel_init_vfs_file_hello_end - kernel_init_vfs_file_hello
-	db 10
-	db "/bin/hello"
+	;dq kernel_init_vfs_file_hello
+	;dq kernel_init_vfs_file_hello_end - kernel_init_vfs_file_hello
+	;db 10
+	;db "/bin/hello"
 
-	dq kernel_init_vfs_file_free
-	dq kernel_init_vfs_file_free_end - kernel_init_vfs_file_free
-	db 9
-	db "/bin/free"
+	;dq kernel_init_vfs_file_free
+	;dq kernel_init_vfs_file_free_end - kernel_init_vfs_file_free
+	;db 9
+	;db "/bin/free"
 
 	dq kernel_init_vfs_file_console
 	dq kernel_init_vfs_file_console_end - kernel_init_vfs_file_console
 	db 12
-
-.console:
 	db "/bin/console"
-
-.console_end:
-
 	dq STATIC_EMPTY
 
-	kernel_init_vfs_file_init incbin "build/init"
+;kernel_init_vfs_file_init_end:
+	; kernel_init_vfs_file_shell incbin "build/shell"
 
-kernel_init_vfs_file_init_end:
-	kernel_init_vfs_file_shell incbin "build/shell"
+;kernel_init_vfs_file_shell_end:
+	; kernel_init_vfs_file_hello incbin "build/hello"
 
-kernel_init_vfs_file_shell_end:
-	kernel_init_vfs_file_hello incbin "build/hello"
-
-kernel_init_vfs_file_hello_end:
-	kernel_init_vfs_file_free incbin "build/free"
+;kernel_init_vfs_file_hello_end:
+	; kernel_init_vfs_file_free incbin "build/free"
 
 kernel_init_vfs_file_free_end:
 	kernel_init_vfs_file_console incbin "build/console"

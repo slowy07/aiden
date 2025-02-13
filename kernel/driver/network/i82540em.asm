@@ -225,14 +225,6 @@ driver_nic_i82540em_vlan   dw STATIC_EMPTY ; Hold VLAN setting if applicable
 driver_nic_i82540em_rx_count dq STATIC_EMPTY ; Tracking received packet
 driver_nic_i82540em_tx_count dq STATIC_EMPTY ; Tracking transmited packet
 
-; Printing status message
-driver_nic_i82540em_string   db STATIC_COLOR_ASCII_GREEN_LIGHT, "::", STATIC_COLOR_ASCII_DEFAULT, " Network controller:", STATIC_ASCII_NEW_LINE, "   Intel 82540EM, MAC ", STATIC_COLOR_ASCII_WHITE
-
-driver_nic_i82540em_string_end:
-	driver_nic_i82540em_string_irq   db STATIC_COLOR_ASCII_DEFAULT, ", IRQ ", STATIC_COLOR_ASCII_WHITE
-
-driver_nic_i82540em_string_irq_end:
-
 driver_nic_i82540em_irq:
 	; Save register and flag
 	push rax
@@ -453,51 +445,6 @@ driver_nic_i82540em:
 
 	; Perform additional setup for the NIC
 	call driver_nic_i82540em_setup
-
-	; Print the NIC initialization string
-	mov  ecx, driver_nic_i82540em_string_end - driver_nic_i82540em_string
-	mov  rsi, driver_nic_i82540em_string
-	call kernel_video_string
-
-	; Print the MAC address
-	mov bl, STATIC_NUMBER_SYSTEM_hexadecimal
-
-	xor cl, cl
-
-	mov dl, 6
-
-	mov rsi, driver_nic_i82540em_mac_address
-
-.mac:
-	lodsb
-
-	call kernel_video_number
-
-	dec dl
-	jz  .end
-
-	; Print a colon between MAC address bytes
-	mov  eax, STATIC_ASCII_COLON
-	mov  cl, 1
-	call kernel_video_char
-
-	jmp .mac
-
-.end:
-	; Print the IRQ number
-	mov  ecx, driver_nic_i82540em_string_irq_end - driver_nic_i82540em_string_irq
-	mov  rsi, driver_nic_i82540em_string_irq
-	call kernel_video_string
-
-	movzx eax, byte [driver_nic_i82540em_irq_number]
-	mov   bl, STATIC_NUMBER_SYSTEM_decimal
-	xor   ecx, ecx
-	call  kernel_video_number
-
-	; Print a newline character
-	mov  eax, STATIC_ASCII_NEW_LINE
-	mov  cl, 1
-	call kernel_video_char
 
 	; Restore registers
 	pop r11

@@ -6,6 +6,7 @@ console:
 	jmp $
 
 %include "software/console/data.asm"
-%include "software/console/clear.asm"
 %include "include/unit.asm"
+%include "include/font.asm"
 %include "include/page_from_size.asm"
+%include "include/terminal.asm"

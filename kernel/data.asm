@@ -28,3 +28,9 @@ kernel_idt_header:
 	dq STATIC_EMPTY
 
 	macro_debug "kernel_data"
+
+kernel_video_width_pixel dq STATIC_EMPTY
+kernel_video_height_pixel dq STATIC_EMPTY
+kernel_video_base_address dq STATIC_EMPTY
+kernel_video_size_byte dq STATIC_EMPTY
+kernel_video_scanline_byte dq STATIC_EMPTY

@@ -1,7 +1,11 @@
 service_date_clock_last_state dq STATIC_EMPTY
 service_date_clock_colon db STATIC_ASCII_SPACE
 
-align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
+service_date_event_console_file db "/bin/console"
+
+service_date_event_console_file_end:
+
+	align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
 
 service_date_ipc_data:
 	times KERNEL_IPC_STRUCTURE.SIZE db STATIC_EMPTY

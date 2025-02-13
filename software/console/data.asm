@@ -25,15 +25,28 @@ dq STATIC_EMPTY
 
 .element_header_end:
 
-	.element_draw_0:  dd INCLUDE_UNIT_ELEMENT_TYPE_draw
-	dq .element_draw_0_end - .element_draw_0
+	.element_terminal:  dd INCLUDE_UNIT_ELEMENT_TYPE_draw
+	dq .element_terminal_end - .element_terminal
 	dq 0
 	dq INCLUDE_UNIT_ELEMENT_HEADER_HEIGHT_pixel
 	dq CONSOLE_WINDOW_WIDTH_pixel
 	dq CONSOLE_WINDOW_HEIGHT_pixel - INCLUDE_UNIT_ELEMENT_HEADER_HEIGHT_pixel
 	dq STATIC_EMPTY
 
-.element_draw_0_end:
+.element_terminal_end:
 	dd STATIC_EMPTY
 
 console_window_end:
+
+console_terminal_table dq CONSOLE_WINDOW_WIDTH_pixel
+                       dq CONSOLE_WINDOW_HEIGHT_pixel - INCLUDE_UNIT_ELEMENT_HEADER_HEIGHT_pixel
+                       dq (CONSOLE_WINDOW_WIDTH_pixel * (CONSOLE_WINDOW_HEIGHT_pixel - INCLUDE_UNIT_ELEMENT_HEADER_HEIGHT_pixel)) << KERNEL_VIDEO_DEPTH_shift
+                       dq CONSOLE_WINDOW_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
+                       dq STATIC_EMPTY
+                       dq STATIC_EMPTY
+                       dq STATIC_EMPTY
+                       dq STATIC_EMPTY
+                       dq STATIC_EMPTY
+                       dq STATIC_EMPTY
+                       dq 0x00F5F5F5
+                       dq 0x00000000

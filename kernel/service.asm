@@ -72,68 +72,16 @@ kernel_service:
 	jmp kernel_service.end
 
 .video:
-	cmp ax, KERNEL_SERVICE_VIDEO_string
-	je  .video_string
-
-	cmp ax, KERNEL_SERVICE_VIDEO_cursor
-	je  .video_cursor
-
-	cmp ax, KERNEL_SERVICE_VIDEO_char
-	je  .video_char
-
-	cmp ax, KERNEL_SERVICE_VIDEO_clean
-	je  .video_clean
-
 	cmp ax, KERNEL_SERVICE_VIDEO_properties
 	je  .video_properties
 
-	cmp ax, KERNEL_SERVICE_VIDEO_number
-	je  .video_number
-
-	cmp ax, KERNEL_SERVICE_VIDEO_cursor_set
-	je  .video_cursor_set
-
 	jmp kernel_service.error
-
-.video_string:
-	call kernel_video_string
-
-	jmp kernel_service.end
-
-.video_cursor:
-	mov rbx, qword [kernel_video_cursor]
-
-	jmp kernel_service.end
-
-.video_char:
-	mov  ax, dx
-	call kernel_video_char
-
-	jmp kernel_service.end
-
-.video_clean:
-	call kernel_video_drain
-
-	jmp kernel_service.end
 
 .video_properties:
 	mov r8, qword [kernel_video_width_pixel]
 	mov r9, qword [kernel_video_height_pixel]
 
 	mov r10, qword [kernel_video_size_byte]
-
-	jmp kernel_service.end
-
-.video_number:
-	mov  rax, r8
-	call kernel_video_number
-
-	jmp kernel_service.end
-
-.video_cursor_set:
-	mov qword [kernel_video_cursor], rbx
-
-	call kernel_video_cursor_set
 
 	jmp kernel_service.end
 
