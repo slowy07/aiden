@@ -36,8 +36,6 @@ service_render_event:
 	mov  cl, SERVICE_RENDER_IPC_MOUSE_BUTTON_LEFT_press
 	call service_render_ipc
 
-	call service_render_object_hide
-
 	test qword [rsi + SERVICE_RENDER_STRUCTURE_OBJECT.SIZE + SERVICE_RENDER_STRUCTURE_OBJECT_EXTRA.flags], SERVICE_RENDER_OBJECT_FLAG_fixed_z
 	jnz  .fixed_z
 
@@ -51,6 +49,7 @@ service_render_event:
 	or qword [service_render_object_cursor + SERVICE_RENDER_STRUCTURE_OBJECT.SIZE + SERVICE_RENDER_STRUCTURE_OBJECT_EXTRA.flags], SERVICE_RENDER_OBJECT_FLAG_flush
 
 .fixed_z:
+	call service_render_object_hide
 
 .no_mouse_button_left_action:
 	bt word [driver_ps2_mouse_state], DRIVER_PS2_DEVICE_MOUSE_PACKET_LMB_bit

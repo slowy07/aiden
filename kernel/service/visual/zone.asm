@@ -94,10 +94,8 @@ service_render_zone:
 	push r13
 	push r14
 	push r15
-
-	macro_lock service_render_object_semaphore, 0
-
-	cmp qword [service_render_zone_list_records], STATIC_EMPTY
+	
+  cmp qword [service_render_zone_list_records], STATIC_EMPTY
 	je  .end
 
 	mov rdi, qword [service_render_zone_list_address]
@@ -261,8 +259,6 @@ service_render_zone:
 
 .end:
 	mov qword [service_render_zone_list_records], STATIC_EMPTY
-
-	mov byte [service_render_object_semaphore], STATIC_FALSE
 
 	pop r15
 	pop r14
