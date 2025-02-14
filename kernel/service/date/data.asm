@@ -1,5 +1,3 @@
-	; Store the last modification time of the window list
-	service_date_window_list_modify_time dq STATIC_EMPTY
 	; Store the last state of the clock
 	service_date_clock_last_state dq STATIC_EMPTY
 	; Character to be displayed as the clock colon, initially set to space
@@ -34,6 +32,9 @@ service_date_ipc_data:
 
 	;     Align memory for correct struct alignment
 	align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
+
+	; add window taskbar date
+	service_date_window_taskbar_modify_time dq STATIC_EMPTY
 
 	;  Define taskbar window properties
 	service_date_window_taskbar  dq 0 ; Taskbar window pointer

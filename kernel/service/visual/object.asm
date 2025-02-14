@@ -41,6 +41,8 @@ service_render_object_insert:
 	push rcx
 	push rsi
 
+	macro_lock service_render_object_semaphore, 0
+
 	cmp qword [service_render_object_list_records_free], STATIC_EMPTY
 	je  .end
 
@@ -80,6 +82,8 @@ service_render_object_insert:
 	mov qword [service_render_object_list_modify_time], rax
 
 .end:
+	mov byte [service_render_object_semaphore], STATIC_FALSE
+
 	pop rsi
 	pop rcx
 	pop rdi
@@ -203,6 +207,8 @@ service_render_object_find:
 macro_debug "service_render_object_find"
 
 service_render_object_up:
+	push qword [service_render_object_list_modify_time]
+
 	push rsi
 
 	call service_render_object_insert
@@ -217,6 +223,8 @@ service_render_object_up:
 
 	sub rsi, SERVICE_RENDER_STRUCTURE_OBJECT.SIZE + SERVICE_RENDER_STRUCTURE_OBJECT_EXTRA.SIZE
 
+	pop qword [service_render_object_list_modify_time]
+
 	ret
 
 macro_debug "service_render_object_up"
@@ -225,6 +233,8 @@ service_render_object_remove:
 	push rcx
 	push rsi
 	push rdi
+
+  macro_lock service_render_object_semaphore, 0
 
 	mov rdi, rsi
 	add rsi, SERVICE_RENDER_STRUCTURE_OBJECT.SIZE + SERVICE_RENDER_STRUCTURE_OBJECT_EXTRA.SIZE
@@ -238,8 +248,10 @@ service_render_object_remove:
 
 	dec qword [service_render_object_list_records]
 
-  mov rcx, qword [driver_rtc_microtime]
-  mov qword [service_render_object_list_modify_time], rcx
+	mov rcx, qword [driver_rtc_microtime]
+	mov qword [service_render_object_list_modify_time], rcx
+
+  mov byte [service_render_object_semaphore], STATIC_FALSE
 
 	pop rdi
 	pop rsi

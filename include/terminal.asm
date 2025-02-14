@@ -132,6 +132,7 @@ include_terminal_cursor_enable:
 	; Toggles the visibility of the terminal cursor
 
 include_terminal_cursor_switch:
+  ; Save regiser
 	push rax
 	push rcx
 	push rdi
@@ -144,9 +145,10 @@ include_terminal_cursor_switch:
 	mov rdi, qword [r8 + INCLUDE_TERMINAL_STRUCTURE.pointer]
 
 .loop:
-	not dword [rdi]; Invert cursor pixel color
-	;   Ensure max brightness or visibility
-	or  byte [rdi + 0x03], STATIC_MAX_unsigned
+  ; Invert the first word at the cursor position (toggle cursor display)
+	not word [rdi]
+   Invert the next byte after the word (potentially part of cursor styling)
+	not byte [rdi + STATIC_WORD_SIZE_byte]
 
 	add rdi, rax; Move to the next scanline
 	dec rcx; Decrement loop counter
@@ -160,17 +162,18 @@ include_terminal_cursor_switch:
 
 	ret
 
-; Sets the terminal cursor position
+	; Sets the terminal cursor position
+
 include_terminal_cursor_set:
-  ; Save register
+	;    Save register
 	push rax
 	push rcx
 	push rdx
 
-  ; Compute vertical cursor position
+	;    Compute vertical cursor position
 	call include_terminal_cursor_disable
 
-  ; Compute horizontal cursor position
+	;    Compute horizontal cursor position
 	mov  eax, dword [r8 + INCLUDE_TERMINAL_STRUCTURE.cursor + INCLUDE_TERMINAL_STRUCTURE_CURSOR.y]
 	mul  qword [r8 + INCLUDE_TERMINAL_STRUCTURE.scanline_char]
 	push rax
@@ -179,23 +182,24 @@ include_terminal_cursor_set:
 	add  qword [rsp], rax
 	pop  rax
 
-  ; Compute final cursor address
+	;   Compute final cursor address
 	add rax, qword [r8 + INCLUDE_TERMINAL_STRUCTURE.address]
 	mov qword [r8 + INCLUDE_TERMINAL_STRUCTURE.pointer], rax
 
 	call include_terminal_cursor_enable
 
-  ; Restore register
+	;   Restore register
 	pop rdx
 	pop rcx
 	pop rax
 
-  ; Return from function
+	; Return from function
 	ret
 
-; Renders a character matrix onto the terminal display
+	; Renders a character matrix onto the terminal display
+
 include_terminal_matrix:
-  ; Save register
+	;    Save register
 	push rax
 	push rbx
 	push rcx
@@ -204,43 +208,43 @@ include_terminal_matrix:
 	push rdi
 	push r9
 
-  ; Compute font matrix offset based on character height
+	;   Compute font matrix offset based on character height
 	mov ebx, dword [include_font_height_pixel]
 	mul rbx
 
-  ; Load font matrix pointer
+	;   Load font matrix pointer
 	mov rsi, include_font_matrix
 	add rsi, rax
 
-  ; Load foreground color
+	;   Load foreground color
 	mov r9d, dword [r8 + INCLUDE_TERMINAL_STRUCTURE.foreground_color]
 
 .next:
-	mov ecx, INCLUDE_FONT_WIDTH_pixel - 0x01 ; Set pixel width counter
+	mov ecx, INCLUDE_FONT_WIDTH_pixel - 0x01; Set pixel width counter
 
 .loop:
-	bt  word [rsi], cx ; Test bit in font matrix
-	jnc .continue ; Skip if bit is not set
+	bt  word [rsi], cx; Test bit in font matrix
+	jnc .continue; Skip if bit is not set
 
-	mov dword [rdi], r9d ; Set pixel to foreground
-	mov dword [rdi + STATIC_QWORD_SIZE_byte], STATIC_EMPTY ; Clear adjacent pixel
+	mov dword [rdi], r9d; Set pixel to foreground
+	mov dword [rdi + STATIC_QWORD_SIZE_byte], STATIC_EMPTY; Clear adjacent pixel
 
 .continue:
-	add rdi, STATIC_DWORD_SIZE_byte ; Move to next pixel
+	add rdi, STATIC_DWORD_SIZE_byte; Move to next pixel
 
-	dec cl ; Decrease column counter
-	jns .loop ; Repeat for all columns
+	dec cl; Decrease column counter
+	jns .loop; Repeat for all columns
 
-  ; Adjust for next scanline
+	;   Adjust for next scanline
 	sub rdi, INCLUDE_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
 	add rdi, qword [r8 + INCLUDE_TERMINAL_STRUCTURE.scanline_byte]
 
-	inc rsi ; Move to next row in font matrix
+	inc rsi; Move to next row in font matrix
 
-	dec bl ; Decrease row counter
-	jnz .next ; Decrease row counter
+	dec bl; Decrease row counter
+	jnz .next; Decrease row counter
 
-  ; Restore register
+	;   Restore register
 	pop r9
 	pop rdi
 	pop rsi
@@ -249,12 +253,13 @@ include_terminal_matrix:
 	pop rbx
 	pop rax
 
-  ; Return to function
+	; Return to function
 	ret
 
-; Clear a character space on the terminal display
+	; Clear a character space on the terminal display
+
 include_terminal_empty_char:
-  ; Save register
+	;    Save register
 	push rax
 	push rbx
 	push rcx
@@ -280,19 +285,20 @@ include_terminal_empty_char:
 	dec bl
 	jnz .next
 
-  ; Restore to register
+	;   Restore to register
 	pop rdi
 	pop rdx
 	pop rcx
 	pop rbx
 	pop rax
 
-  ; Return to function
+	; Return to function
 	ret
 
-; Handles rendering and positioning of characters on the terminal
+	; Handles rendering and positioning of characters on the terminal
+
 include_terminal_char:
-  ; Save register
+	;    Save register
 	push rax
 	push rbx
 	push rcx

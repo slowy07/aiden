@@ -85,7 +85,7 @@ kernel_memory_alloc:
 	jmp .reload
 
 .error:
-	mov qword [rsp + STATIC_QWORD_SIZE_byte], KERNEL_ERROR_PAGE_memory_low
+	mov qword [rsp + STATIC_QWORD_SIZE_byte], KERNEL_ERROR_memory_low
 
 	stc
 

@@ -572,7 +572,7 @@ kernel_page_secure:
 	jmp .end
 
 .error:
-	mov qword [rsp], KERNEL_ERROR_PAGE_memory_low
+	mov qword [rsp], KERNEL_ERROR_memory_low
 
 	stc
 

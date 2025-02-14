@@ -15,7 +15,6 @@ kernel_exec:
 	call include_page_from_size
 
 	mov r12, rcx
-	shl r12, KERNEL_PAGE_SIZE_shift
 
 	add  rcx, 14
 	call kernel_page_secure
@@ -32,9 +31,11 @@ kernel_exec:
 
 	mov  rax, KERNEL_MEMORY_HIGH_VIRTUAL_address
 	mov  bx, KERNEL_PAGE_FLAG_available | KERNEL_PAGE_FLAG_write | KERNEL_PAGE_FLAG_user
+	mov  rcx, r12
 	call kernel_page_map_logical
 	jc   .error
 
+	shl  r12, KERNEL_PAGE_SIZE_shift
 	add  rax, r12
 	and  bx, ~KERNEL_PAGE_FLAG_user
 	mov  rcx, KERNEL_MEMORY_MAP_SIZE_page

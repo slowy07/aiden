@@ -5,7 +5,7 @@ service_date:
 
 .loop:
 	call service_date_ipc
-
+	call service_date_taskbar
 	call service_date_clock
 
 	jmp .loop
@@ -14,6 +14,7 @@ service_date:
 %include "kernel/service/date/clock.asm"
 %include "kernel/service/date/ipc.asm"
 %include "kernel/service/date/event.asm"
+%include "kernel/service/date/taskbar.asm"
 
 %include "include/unit.asm"
 %include "include/font.asm"

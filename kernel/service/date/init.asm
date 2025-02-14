@@ -98,4 +98,4 @@ service_date_init:
 	call service_render_object_insert
 	;    Synchronize the modification timestamps between service date and service render
 	mov  rax, qword [service_render_object_list_modify_time]
-	mov  qword [service_date_window_list_modify_time], rax
+	mov  qword [service_date_window_taskbar_modify_time], rax
