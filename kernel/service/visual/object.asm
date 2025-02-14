@@ -76,6 +76,9 @@ service_render_object_insert:
 	call kernel_task_active_pid
 	mov  qword [rdi + SERVICE_RENDER_STRUCTURE_OBJECT.SIZE + SERVICE_RENDER_STRUCTURE_OBJECT_EXTRA.pid], rax
 
+	mov rax, qword [driver_rtc_microtime]
+	mov qword [service_render_object_list_modify_time], rax
+
 .end:
 	pop rsi
 	pop rcx
@@ -234,6 +237,9 @@ service_render_object_remove:
 	jne .loop
 
 	dec qword [service_render_object_list_records]
+
+  mov rcx, qword [driver_rtc_microtime]
+  mov qword [service_render_object_list_modify_time], rcx
 
 	pop rdi
 	pop rsi

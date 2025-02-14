@@ -1,6 +1,5 @@
 %include "include/unit/config.asm"
 %include "include/unit/data.asm"
-%include "include/unit/font.asm"
 
 include_unit:
 	push rax
@@ -111,6 +110,24 @@ include_unit_elements:
 	cmp eax, INCLUDE_UNIT_ELEMENT_TYPE_draw
 	je  .leave
 
+	cmp eax, INCLUDE_UNIT_ELEMENT_TYPE_chain
+	jne .other
+
+	cmp qword [rsi + INCLUDE_UNIT_STRUCTURE_ELEMENT_CHAIN.address], STATIC_EMPTY
+	je  .leave
+
+	push rsi
+
+	mov  rsi, qword [rsi + INCLUDE_UNIT_STRUCTURE_ELEMENT_CHAIN.address]
+	call include_unit_elements
+
+	pop rsi
+
+	add rsi, INCLUDE_UNIT_STRUCTURE_ELEMENT_CHAIN.SIZE
+
+	jmp .loop
+
+.other:
 	call qword [rbx + rax * STATIC_QWORD_SIZE_byte]
 
 .leave:
@@ -191,12 +208,12 @@ include_unit_string:
 
 	call include_unit_char
 
-	add rdi, INCLUDE_UNIT_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
+	add rdi, INCLUDE_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
 
 	dec rcx
 	jz  .end
 
-	sub r11, INCLUDE_UNIT_FONT_WIDTH_pixel
+	sub r11, INCLUDE_FONT_WIDTH_pixel
 	jns .loop
 
 .end:
@@ -216,22 +233,22 @@ include_unit_char:
 	push r12
 	push r11
 
-	mov rsi, include_unit_font_matrix
+	mov rsi, include_font_matrix
 
-	sub al, byte [include_unit_font_offset]
+	sub al, INCLUDE_FONT_MATRIX_offset
 	js  .end
 
-	mul qword [include_unit_font_height_pixel]
+	mul qword [include_font_height_pixel]
 	add rsi, rax
 
 	mov eax, ebx
 
-	mov rdx, qword [include_unit_font_height_pixel]
+	mov rdx, qword [include_font_height_pixel]
 
 .next:
 	mov r11, qword [rsp]
 
-	mov rcx, qword [include_unit_font_width_pixel]
+	mov rcx, qword [include_font_width_pixel]
 	dec rcx
 
 .loop:
@@ -261,7 +278,7 @@ include_unit_char:
 	jns .loop
 
 .end_of_line:
-	sub rdi, INCLUDE_UNIT_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
+	sub rdi, INCLUDE_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
 	add rdi, r10
 
 	inc rsi
@@ -364,9 +381,6 @@ include_unit_element_drain:
 	pop rdx
 	pop rcx
 
-	ret
-
-include_unit_element_chain:
 	ret
 
 include_unit_element_label:

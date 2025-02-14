@@ -14,7 +14,7 @@ include_unit_element_entry:
 	dq STATIC_EMPTY
 
 .chain:
-	dq include_unit_element_chain
+	dq STATIC_EMPTY
 
 .button:
 	dq include_unit_element_button

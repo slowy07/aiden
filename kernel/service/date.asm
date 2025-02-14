@@ -16,3 +16,4 @@ service_date:
 %include "kernel/service/date/event.asm"
 
 %include "include/unit.asm"
+%include "include/font.asm"
