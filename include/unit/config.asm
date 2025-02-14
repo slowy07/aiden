@@ -1,3 +1,4 @@
+INCLUDE_UNIT_WINDOW_NAME_length equ 23
 INCLUDE_UNIT_WINDOW_BACKGROUND_color equ 0x00151515
 
 INCLUDE_UNIT_WINDOW_FLAG_visible equ 1 << 0
@@ -47,6 +48,8 @@ struc   INCLUDE_UNIT_STRUCTURE_FIELD
 	.size     resb 8
 	.flags    resb 8
 	.id       resb 8
+	.length   resb 1
+	.name     resb INCLUDE_UNIT_WINDOW_NAME_length
 	.scanline resb 8
 
 .SIZE:
@@ -80,6 +83,7 @@ struc   INCLUDE_UNIT_STRUCTURE_FIELD
 	.length  resb 1
 
 .string:
+.SIZE:
 	endstruc
 
 	struc    INCLUDE_UNIT_STRUCTURE_ELEMENT_DRAW

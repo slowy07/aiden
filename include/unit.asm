@@ -113,8 +113,8 @@ include_unit_elements:
 	cmp eax, INCLUDE_UNIT_ELEMENT_TYPE_chain
 	jne .other
 
-	cmp qword [rsi + INCLUDE_UNIT_STRUCTURE_ELEMENT_CHAIN.address], STATIC_EMPTY
-	je  .leave
+	cmp qword [rsi + INCLUDE_UNIT_STRUCTURE_ELEMENT_CHAIN.size], STATIC_EMPTY
+	je  .empty
 
 	push rsi
 
@@ -123,6 +123,7 @@ include_unit_elements:
 
 	pop rsi
 
+.empty:
 	add rsi, INCLUDE_UNIT_STRUCTURE_ELEMENT_CHAIN.SIZE
 
 	jmp .loop
@@ -138,6 +139,48 @@ include_unit_elements:
 .ready:
 	pop rsi
 	pop rcx
+	pop rbx
+	pop rax
+
+	ret
+
+include_unit_element_chain:
+	;    Save register
+	push rax
+	push rbx
+	push rsi
+	push r8
+	push r9
+	push r10
+
+	mov r8, qword [rdi + INCLUDE_UNIT_STRUCTURE_WINDOW.field + INCLUDE_UNIT_STRUCTURE_FIELD.width]
+	mov r9, qword [rdi + INCLUDE_UNIT_STRUCTURE_WINDOW.field + INCLUDE_UNIT_STRUCTURE_FIELD.height]
+	mov r10, qword [rdi + INCLUDE_UNIT_STRUCTURE_WINDOW.SIZE + INCLUDE_UNIT_STRUCTURE_WINDOW_EXTRA.scanline]
+
+	mov rbx, include_unit_element_entry
+
+	mov rsi, qword [rsi + INCLUDE_UNIT_STRUCTURE_ELEMENT_CHAIN.address]
+
+.loop:
+	mov eax, dword [rsi + INCLUDE_UNIT_STRUCTURE_ELEMENT.type]
+	cmp eax, STATIC_EMPTY
+	je  .ready
+
+	cmp eax, INCLUDE_UNIT_ELEMENT_TYPE_draw
+	je  .leave
+
+	call qword [rbx + rax * STATIC_QWORD_SIZE_byte]
+
+.leave:
+	add rsi, qword [rsi + INCLUDE_UNIT_STRUCTURE_ELEMENT.size]
+	jmp .loop
+
+.ready:
+	;   Restore original register
+	pop r10
+	pop r9
+	pop r8
+	pop rsi
 	pop rbx
 	pop rax
 

@@ -3,6 +3,9 @@ service_date_init:
 	cmp byte [service_render_semaphore], STATIC_FALSE
 	je  service_date_init; If false, wait for it to be set
 
+	call kernel_task_active_pid
+	mov  qword [service_date_pid], rax
+
 	;   Initialize the workbench window structure
 	mov rsi, service_date_window_workbench
 

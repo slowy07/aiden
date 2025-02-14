@@ -77,6 +77,10 @@ driver_rtc_get_date_and_time:
 
 	mov byte [driver_rtc_date_and_time + DRIVER_RTC_STRUCTURE.hour], al
 
+	mov al, DRIVER_RTC_PORT_STATUS_REGISTER_C
+	out DRIVER_RTC_PORT_command, al
+	in  al, DRIVER_RTC_PORT_data
+
 	pop rax
 
 	ret

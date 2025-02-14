@@ -147,7 +147,7 @@ include_terminal_cursor_switch:
 .loop:
   ; Invert the first word at the cursor position (toggle cursor display)
 	not word [rdi]
-   Invert the next byte after the word (potentially part of cursor styling)
+  ; Invert the next byte after the word (potentially part of cursor styling)
 	not byte [rdi + STATIC_WORD_SIZE_byte]
 
 	add rdi, rax; Move to the next scanline

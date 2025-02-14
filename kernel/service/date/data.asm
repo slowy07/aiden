@@ -1,8 +1,9 @@
-	; Store the last state of the clock
+	service_date_pid dq STATIC_EMPTY
+	;Store the last state of the clock
 	service_date_clock_last_state dq STATIC_EMPTY
-	; Character to be displayed as the clock colon, initially set to space
+	;      Character to be displayed as the clock colon, initially set to space
 	service_date_clock_colon db STATIC_ASCII_SPACE
-	; Path to the event console binary file
+	;      Path to the event console binary file
 	service_date_event_console_file db "/bin/console"
 
 service_date_event_console_file_end:
@@ -28,6 +29,8 @@ service_date_ipc_data:
 	;  Window flag
 	dq INCLUDE_UNIT_WINDOW_FLAG_fixed_xy | INCLUDE_UNIT_WINDOW_FLAG_fixed_z | INCLUDE_UNIT_WINDOW_FLAG_visible | INCLUDE_UNIT_WINDOW_FLAG_flush
 	dq STATIC_EMPTY; Placeholder for additional properties
+	db 16
+	db "date - workbench       "
 	dq STATIC_EMPTY; Placeholder for additional properties
 
 	;     Align memory for correct struct alignment
@@ -49,6 +52,8 @@ service_date_ipc_data:
 	dq STATIC_EMPTY
 	dq INCLUDE_UNIT_WINDOW_FLAG_fixed_xy | INCLUDE_UNIT_WINDOW_FLAG_fixed_z | INCLUDE_UNIT_WINDOW_FLAG_arbiter | INCLUDE_UNIT_WINDOW_FLAG_visible | INCLUDE_UNIT_WINDOW_FLAG_flush | INCLUDE_UNIT_WINDOW_FLAG_unregistered
 	dq STATIC_EMPTY
+	db 14
+	db "cero - taskbar         "
 	dq STATIC_EMPTY
 
 	; UI elements for taskbar
@@ -56,7 +61,7 @@ service_date_ipc_data:
 .elements:
 	;  Chain Element (Placeholder for additional elements)
 	.element_chain_0:   dd INCLUDE_UNIT_ELEMENT_TYPE_chain  ; Element type: Chain
-	dq INCLUDE_UNIT_STRUCTURE_ELEMENT_CHAIN.SIZE; Size of the chain element structure
+	dq STATIC_EMPTY; Placeholder
 	dq STATIC_EMPTY; Placeholder
 
 	;  Clock Label Element
@@ -96,6 +101,8 @@ service_date_window_menu:
 	;  Flags for fragile & unregistered window behavior
 	dq INCLUDE_UNIT_WINDOW_FLAG_fragile | INCLUDE_UNIT_WINDOW_FLAG_unregistered
 	dq STATIC_EMPTY; Reserved field
+	db 11
+	db "cero - menu            "
 	dq STATIC_EMPTY; Reserved field
 
 	; UI Elements for Menu Window
