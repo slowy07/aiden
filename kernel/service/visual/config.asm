@@ -16,22 +16,6 @@
 	SERVICE_RENDER_FILL_LIST_limit equ (KERNEL_PAGE_SIZE_byte / SERVICE_RENDER_STRUCTURE_FILL.SIZE) - 0x01
 	SERVICE_RENDER_ZONE_LIST_limit equ (KERNEL_PAGE_SIZE_byte / SERVICE_RENDER_STRUCTURE_ZONE.SIZE) - 0x01
 
-	; Inter-Process Communication mouse button codes
-	; These constants define the codes used for IPC messages related to mouse button actions
-	SERVICE_RENDER_IPC_MOUSE_BUTTON_LEFT_press equ 0 ; Left mouse button press event
-	SERVICE_RENDER_IPC_MOUSE_BUTTON_RIGHT_press equ 1 ; Right mouse button press event
-
-	; IPC structure
-
-	;         Structure representing an IPC (Inter-Process Communication) event for the render service
-	struc     SERVICE_RENDER_STRUCTURE_IPC
-	.type     resb 1; IPC event type (1 byte)
-	.reserved resb 7; Reserved bytes for alignment (7 bytes)
-	.id       resb 8; Unique identifier of the IPC event (8 bytes)
-	.value0   resb 8; First value associated with the event (8 bytes)
-	.value1   resb 8; Second value associated with the event (8 bytes)
-	endstruc
-
 	;       This structure defines the basic properties of a render object, including its position and dimensions
 	struc   SERVICE_RENDER_STRUCTURE_FIELD
 	.x      resb 8; X-coordinate position (8 bytes)
@@ -72,11 +56,11 @@
 .SIZE:
 	endstruc
 
-  ; Zone structure
-  ; Structure defining a render zone, used for region-based rendering
+	;       Zone structure
+	;       Structure defining a render zone, used for region-based rendering
 	struc   SERVICE_RENDER_STRUCTURE_ZONE
-	.field  resb SERVICE_RENDER_STRUCTURE_FIELD.SIZE ; Field structure defining the zone dimensions
-	.object resb 8 ; Reference to the associated object
+	.field  resb SERVICE_RENDER_STRUCTURE_FIELD.SIZE; Field structure defining the zone dimensions
+	.object resb 8; Reference to the associated object
 
 .SIZE:
 	endstruc

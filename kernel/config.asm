@@ -36,13 +36,12 @@
 	; Allocate memory for a process
 	KERNEL_SERVICE_PROCESS_memory_alloc equ 0x0300 + KERNEL_SERVICE_PROCESS
 
+	KERNEL_SERVICE_PROCESS_ipc_receive equ 0x0400 + KERNEL_SERVICE_PROCESS
+	KERNEL_SERVICE_PROCESS_pid equ 0x0500 + KERNEL_SERVICE_PROCESS
+
 	; Video Services
 	KERNEL_SERVICE_VIDEO equ 0x0001
 	KERNEL_SERVICE_VIDEO_properties equ 0x0000 + KERNEL_SERVICE_VIDEO
-
-	; Keyboard Services
-	KERNEL_SERVICE_KEYBOARD equ 0x0002
-	KERNEL_SERVICE_KEYBOARD_key equ 0x0000 + KERNEL_SERVICE_KEYBOARD
 
 	; Virtual File System (VFS) Services
 	KERNEL_SERVICE_VFS equ 0x0003
@@ -53,5 +52,30 @@
 	; Get system memory information
 	KERNEL_SERVICE_SYSTEM_memory equ 0x0000 + KERNEL_SERVICE_SYSTEM
 
+	struc KERNEL_IPC_STRUCTURE
+	.ttl  resb 8
+	.pid_source resb 8
+	.pid_destination resb 8
+
+.data:
+	.size    resb 8
+	.pointer resb 8
+	.other   resb 24
+
+.SIZE:
+	endstruc
+
 	; Error Codes
 	KERNEL_ERROR_memory_low equ 0x0001
+
+	SERVICE_RENDER_IPC_KEYBOARD equ 0
+	SERVICE_RENDER_IPC_MOUSE_BUTTON_LEFT_press equ 1
+	SERVICE_RENDER_IPC_MOUSE_BUTTON_RIGHT_press equ 2
+
+	struc     SERVICE_RENDER_STRUCTURE_IPC
+	.type     resb 1
+	.reserved resb 7
+	.id       resb 8
+	.value0   resb 8
+	.value1   resb 8
+	endstruc

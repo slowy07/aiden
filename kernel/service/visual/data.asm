@@ -9,6 +9,8 @@
 	service_render_fill_semaphore db STATIC_FALSE ; Controls filling operations in the render process
 	service_render_zone_semaphore db STATIC_FALSE ; Controls zoning operations in the render process
 
+  ; Keyboard alt semaphore
+  service_render_keyboard_alt_left_semaphore db STATIC_FALSE
 	; Mouse button semaphores
 	service_render_mouse_button_left_semaphore db STATIC_FALSE ; Left mouse button state
 	service_render_mouse_button_right_semaphore db STATIC_FALSE ; Right mouse button state

@@ -14,7 +14,7 @@ mov qword [service_render_object_framebuffer + SERVICE_RENDER_STRUCTURE_OBJECT.f
 mov qword [service_render_object_framebuffer + SERVICE_RENDER_STRUCTURE_OBJECT.field + SERVICE_RENDER_STRUCTURE_FIELD.height], rdx
 
 mov rdi, qword [kernel_video_base_address]
-a
+
 mov qword [service_render_object_framebuffer + SERVICE_RENDER_STRUCTURE_OBJECT.address], rdi
 
 call kernel_memory_alloc_page

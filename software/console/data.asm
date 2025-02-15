@@ -1,6 +1,11 @@
 	;     Aligns the following data to a multiple of `STATIC_QWORD_SIZE_byte`
 	align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
 
+console_ipc_data:
+	times KERNEL_IPC_STRUCTURE.SIZE db STATIC_EMPTY
+
+	align STATIC_QWORD_SIZE_byte, db STATIC_NOTHING
+
 	; This section defines the main properties of the console window
 
 console_window:

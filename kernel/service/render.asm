@@ -19,5 +19,6 @@ service_render:
 %include "kernel/service/visual/event.asm"
 %include "kernel/service/visual/service.asm"
 %include "kernel/service/visual/ipc.asm"
+%include "kernel/service/visual/keyboard.asm"
 
 service_render_end:
