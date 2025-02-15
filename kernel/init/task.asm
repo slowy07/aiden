@@ -7,14 +7,14 @@ kernel_init_task:
 	call include_page_from_size
 
 	call kernel_memory_alloc
-	jc   kernel_init_panic_low_memory
+	jc kernel_panic_memory
 
 	mov qword [kernel_task_active_list], rdi
 
 	mov rsi, rdi
 
 	call kernel_memory_alloc_page
-	jc   kernel_init_panic_low_memory
+	jc kernel_panic_memory
 
 	call kernel_page_drain
 

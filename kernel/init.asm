@@ -5,7 +5,6 @@ je  .entry
 
 .entry:
 	%include "kernel/init/long_mode.asm"
-	%include "kernel/init/panic.asm"
 	%include "kernel/init/data.asm"
 	%include "kernel/init/multiboot.asm"
 	[BITS    64]
@@ -13,6 +12,7 @@ je  .entry
 	%include "kernel/init/apic.asm"
 
 kernel_init:
+  %include "kernel/init/serial.asm"
 	%include "kernel/init/video.asm"
 	%include "kernel/init/memory.asm"
 	%include "kernel/init/acpi.asm"
@@ -27,7 +27,6 @@ kernel_init:
 	%include "kernel/init/network.asm"
 	%include "kernel/init/task.asm"
 	%include "kernel/init/services.asm"
-	%include "kernel/init/serial.asm"
 
 	call kernel_init_apic
 

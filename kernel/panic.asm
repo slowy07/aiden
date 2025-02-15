@@ -1,15 +1,8 @@
+kernel_panic_memory:
+  mov rsi, kernel_init_string_error_memory_low
+
 kernel_panic:
-	mov ah, 0x0C
-
-	mov edi, 0x000B8000
-
-.loop:
-	lodsb
-
-	stosw
-	dec ecx
-	jnz .loop
-
+  call driver_serial_send
 	jmp $
 
 macro_debug "kernel_panic"

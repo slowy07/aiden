@@ -3,6 +3,8 @@ KERNEL_INIT_MEMORY_MULTIBOOT_FLAG_video equ 12
 kernel_init_video:
 	push rbx
 
+	mov rsi, kernel_init_string_error_video_header
+
 	bt  dword [ebx + MULTIBOOT_HEADER.flags], KERNEL_INIT_MEMORY_MULTIBOOT_FLAG_video
 	jnc kernel_panic
 

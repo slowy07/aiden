@@ -10,7 +10,7 @@ kernel_init_services:
 
 .loop:
 	call kernel_memory_alloc_page
-	jc   kernel_init_panic_low_memory
+	jc kernel_panic_memory
 
 	call kernel_page_drain
 

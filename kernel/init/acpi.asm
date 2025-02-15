@@ -119,9 +119,8 @@ kernel_init_acpi:
 
 	cmp esi, 0x000FFFFF
 	jb  .rsdp_search
-
-	mov ecx, kernel_init_string_error_acpi_end - kernel_init_string_error_acpi
-	mov rsi, kernel_init_string_error_acpi
+  
+  mov rsi, kernel_init_string_error_acpi_header
 
 .error:
 	jmp kernel_panic
@@ -162,8 +161,7 @@ kernel_init_acpi:
 	mov r8b, STATIC_FALSE
 
 .standard:
-	mov ecx, kernel_init_string_error_acpi_corrupted_end - kernel_init_string_error_acpi_corrupted
-	mov rsi, kernel_init_string_error_acpi_corrupted
+  mov rsi, kernel_init_string_error_acpi
 
 	cmp dword [rdi + ACPI_STRUCTURE_RSDT_or_XSDT.signature], "RSDT"
 	je  .found
@@ -209,13 +207,11 @@ kernel_init_acpi:
 	jnz .rsdt_pointers_loop
 
 .summary:
-	mov ecx, kernel_init_string_error_apic_end - kernel_init_string_error_apic
 	mov rsi, kernel_init_string_error_apic
 
 	cmp byte [kernel_apic_count], STATIC_EMPTY
 	je  .error
 
-	mov ecx, kernel_init_string_error_ioapic_end - kernel_init_string_error_ioapic
 	mov rsi, kernel_init_string_error_ioapic
 
 	cmp byte [kernel_init_ioapic_semaphore], STATIC_FALSE

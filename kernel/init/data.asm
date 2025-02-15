@@ -1,92 +1,79 @@
-kernel_init_string_name    db KERNEL_name
+	; Kernel name
+	kernel_init_string_name db KERNEL_name
 
 kernel_init_string_name_end:
 
-	kernel_init_string_error_memory   db "Init: Memory map, error."
+	; These strings are used for error reporting during kernel bootup.
+	; Each message is null-terminated (STATIC_ASCII_TERMINATOR).
+	kernel_init_string_error_video_header db "Error: no graphic mode header in multiboot table", STATIC_ASCII_TERMINATOR
+	kernel_init_string_error_memory_header db "Error: no memory map header in multiboot header", STATIC_ASCII_TERMINATOR
+	kernel_init_string_error_memory db "Error: memory map damaged", STATIC_ASCII_TERMINATOR
+	kernel_init_string_error_memory_low db "Error: not enough memory", STATIC_ASCII_TERMINATOR
+	kernel_init_string_error_acpi_header db "Error: RSDP/XSDP not found", STATIC_ASCII_TERMINATOR
+	kernel_init_string_error_acpi db "Error: RSDT/XSDT not recognized", STATIC_ASCII_TERMINATOR
+	kernel_init_string_error_apic db "Error: APIC not found", STATIC_ASCII_TERMINATOR
+	kernel_init_string_error_ioapic db "Error: I/O APIC not found", STATIC_ASCII_TERMINATOR
 
-kernel_init_string_error_memory_end:
-	kernel_init_string_error_memory_low  db "Not enough memory."
-
-kernel_init_string_error_memory_low_end:
-	kernel_init_string_acpi_search   db "Looking for a RSDP/XSDP table, "
-
-kernel_init_string_acpi_search_end:
-	kernel_init_string_acpi_search_found:  db "found.", STATIC_ASCII_NEW_LINE
-
-kernel_init_string_acpi_search_found_end:
-	kernel_init_string_error_acpi   db "not found."
-
-kernel_init_string_error_acpi_end:
-	kernel_init_string_error_acpi_corrupted  db "ACPI table, corrupted."
-
-kernel_init_string_error_acpi_corrupted_end:
-	kernel_init_string_error_apic   db "APIC table not found."
-
-kernel_init_string_error_apic_end:
-	kernel_init_string_error_ioapic   db "I/O APIC table not found."
-
-kernel_init_string_error_ioapic_end:
-
-	kernel_init_string_welcome   db STATIC_COLOR_ASCII_GREEN_LIGHT, "Welcome to Aiden Operating System!", STATIC_COLOR_ASCII_GRAY, " (v", KERNEL_version, ".", KERNEL_revision, " ", KERNEL_architecture, ")", STATIC_ASCII_NEW_LINE
-
-kernel_init_string_welcome_end:
-	kernel_init_string_video   db STATIC_COLOR_ASCII_GREEN_LIGHT, "::", STATIC_COLOR_ASCII_DEFAULT, " Video resolution at ", STATIC_COLOR_ASCII_WHITE
-
-kernel_init_string_video_end:
-	kernel_init_string_video_separator  db STATIC_COLOR_ASCII_DEFAULT, "x", STATIC_COLOR_ASCII_WHITE
-
-kernel_init_string_video_separator_end:
-	kernel_init_string_video_font   db STATIC_COLOR_ASCII_GREEN_LIGHT, "::", STATIC_COLOR_ASCII_DEFAULT, " Font: ", STATIC_COLOR_ASCII_DEFAULT
-
-kernel_init_string_video_font_end:
-	kernel_init_string_memory_size   db STATIC_COLOR_ASCII_GREEN_LIGHT, "::", STATIC_COLOR_ASCII_DEFAULT, " Available ", STATIC_COLOR_ASCII_WHITE
-
-kernel_init_string_memory_size_end:
-	kernel_init_string_memory_format  db STATIC_COLOR_ASCII_DEFAULT, " KiB of RAM memory.", STATIC_ASCII_NEW_LINE
-
-kernel_init_string_memory_format_end:
-	kernel_init_string_storage_ide   db STATIC_COLOR_ASCII_GREEN_LIGHT, "::", STATIC_COLOR_ASCII_DEFAULT, " IDE storage devices:", STATIC_ASCII_NEW_LINE
-
-kernel_init_string_storage_ide_end:
-	kernel_init_string_storage_ide_hd  db "   "
-	kernel_init_string_storage_ide_hd_path  db "/dev/hd"
-	kernel_init_string_storage_ide_hd_letter db "a"
+	; These strings define standard storage device paths for IDE drives.
+	; Used for device identification and access.
+	kernel_init_string_storage_ide_hd_path db "/dev/hd" ; Base path for IDE hard drives
+	kernel_init_string_storage_ide_hd_letter db "a" ; Default device letter
 
 kernel_init_string_storage_ide_hd_end:
-	kernel_init_string_storage_ide_size  db " of size ", STATIC_COLOR_ASCII_WHITE
 
-kernel_init_string_storage_ide_size_end:
-	kernel_init_string_storage_ide_format  db " KiB", STATIC_ASCII_NEW_LINE
+	; These variables serve as semaphores (flags) to track the initialization
+	; status of key system components (APIC, I/O APIC, SMP, AP processors).
+	kernel_init_apic_semaphore   db STATIC_FALSE ; APIC initialization status
+	kernel_init_ioapic_semaphore   db STATIC_FALSE ; I/O APIC initialization status
+	kernel_init_smp_semaphore   db STATIC_FALSE ; SMP initialization status
+	kernel_init_ap_semaphore   db STATIC_FALSE ; AP processor initialization status
+	kernel_init_ap_count    db STATIC_EMPTY ; Number of detected APs
 
-kernel_init_string_storage_ide_format_end:
+	kernel_init_apic_id_highest   db STATIC_EMPTY ; Highest detected APIC ID
 
-	kernel_init_apic_semaphore   db STATIC_FALSE
-	kernel_init_ioapic_semaphore   db STATIC_FALSE
-	kernel_init_smp_semaphore   db STATIC_FALSE
-	kernel_init_ap_semaphore   db STATIC_FALSE
-	kernel_init_ap_count    db STATIC_EMPTY
-
-	kernel_init_apic_id_highest   db STATIC_EMPTY
+	; This table lists the kernel services available at boot time.
+	; Each entry consists of:
+	; - A 64-bit pointer to the service entry point
+	; - A byte indicating the length of the service name
+	; - The service name as a null-terminated string
+	
+	; The list ends with a STATIC_EMPTY marker.
 
 kernel_init_services_list:
-	dq service_tresher
-	db 7
+	dq service_tresher; Pointer to "tresher" service
+	db 7; Length of "tresher"
 	db "tresher"
-	dq service_render
-	db 6
+	dq service_render; Pointer to "render" service
+	db 6; Length of "render"
 	db "render"
-	dq service_date
-	db 4
+	dq service_datea; Pointer to "date" service
+	db 4; Length of "date"
 	db "date"
-	dq STATIC_EMPTY
+	dq STATIC_EMPTY; End of list marker
+
+	; Defines the initial directories available in the virtual file system.
+	; Each directory entry consists of:
+	; - A byte indicating the length of the directory name
+	; - The directory name as a null-terminated string
+	
+	; The list ends with a STATIC_EMPTY marker.
 
 kernel_init_vfs_directory_structure:
-	db 0x04
+	db 0x04; Length of "/bin"
 	db "/bin"
-	db 0x04
+	db 0x04; Length of "/dev"
 	db "/dev"
 
-	db STATIC_EMPTY
+	db STATIC_EMPTY; End of list marker
+
+	; Defines initial files available in the VFS.
+	; Each file entry consists of:
+	; - A 64-bit pointer to the file data
+	; - The file size (calculated as the difference between file start and end)
+	; - A byte indicating the length of the file path
+	; - The file path as a null-terminated string
+	
+	; The list ends with a STATIC_EMPTY marker.
 
 kernel_init_vfs_files:
 	;dq kernel_init_vfs_file_init
@@ -109,11 +96,11 @@ kernel_init_vfs_files:
 	;db 9
 	;db "/bin/free"
 
-	dq kernel_init_vfs_file_console
+	dq kernel_init_vfs_file_console; Pointer to "/bin/console" file
 	dq kernel_init_vfs_file_console_end - kernel_init_vfs_file_console
-	db 12
+	db 12; Length of "/bin/console"
 	db "/bin/console"
-	dq STATIC_EMPTY
+	dq STATIC_EMPTY; End of list marker
 
 ;kernel_init_vfs_file_init_end:
 	; kernel_init_vfs_file_shell incbin "build/shell"
@@ -124,12 +111,17 @@ kernel_init_vfs_files:
 ;kernel_init_vfs_file_hello_end:
 	; kernel_init_vfs_file_free incbin "build/free"
 
+	; These sections contain the binary data for initial VFS files.
+	; The actual files are included from external build artifacts.
+
 kernel_init_vfs_file_free_end:
-	kernel_init_vfs_file_console incbin "build/console"
+	kernel_init_vfs_file_console incbin "build/console" ; Include the compiled "console" binary
 
 kernel_init_vfs_file_console_end:
 
+	; This section includes the boot loader binary, used during system startup.
+
 kernel_init_boot_file:
-	incbin "build/boot"
+	incbin "build/boot"; Include the compiled boot binary
 
 kernel_init_boot_file_end:

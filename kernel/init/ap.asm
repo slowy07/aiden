@@ -41,7 +41,7 @@ mov cr0, eax
 	mov rsp, KERNEL_STACK_TEMPORARY_pointer
 
 	call kernel_memory_alloc_page
-	jc   kernel_init_panic_low_memory
+	jc   kernel_panic_memory
 
 	call kernel_page_drain
 

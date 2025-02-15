@@ -8,7 +8,7 @@ endstruc
 
 kernel_init_vfs:
 	call	kernel_memory_alloc_page
-	jc	kernel_init_panic_low_memory	
+	jc kernel_panic_memory
 
 	call	kernel_page_drain
 	mov	qword [kernel_vfs_magicknot + KERNEL_VFS_STRUCTURE_MAGICKNOT.root],	rdi

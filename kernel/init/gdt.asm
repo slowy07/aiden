@@ -16,7 +16,7 @@ struc KERNEL_STRUCTURE_GDT
 
 kernel_init_gdt:
 	call kernel_memory_alloc_page
-	jc   kernel_init_panic_low_memory
+	jc kernel_panic_memory
 
 	call kernel_page_drain
 	mov  qword [kernel_gdt_header + KERNEL_STRUCTURE_GDT_HEADER.address], rdi

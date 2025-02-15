@@ -8,11 +8,8 @@ kernel_init_storage:
 	cmp byte [driver_ide_devices_count], STATIC_EMPTY
 	je  .ide_end
 
-	mov cl, 0x04
-
-	mov rsi, kernel_init_string_storage_ide_hd
-
-	mov rdi, driver_ide_devices
+	mov cl, 0x04	
+  mov rdi, driver_ide_devices
 
 .ide_loop:
 	cmp word [rdi + DRIVER_IDE_STRUCTURE_DEVICE.channel], STATIC_EMPTY

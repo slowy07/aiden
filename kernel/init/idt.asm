@@ -5,7 +5,7 @@ endstruc
 
 kernel_init_idt:
 	call kernel_memory_alloc_page
-	jc   kernel_init_panic_low_memory
+  jc kernel_panic_memory
 
 	call kernel_page_drain
 	mov  qword [kernel_idt_header + KERNEL_STRUCTURE_IDT_HEADER.address], rdi

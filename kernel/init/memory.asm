@@ -10,8 +10,7 @@ struc    KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP
 	endstruc
 
 kernel_init_memory:
-	mov ecx, kernel_init_string_error_memory_end - kernel_init_string_error_memory
-	mov rsi, kernel_init_string_error_memory
+	mov rsi, kernel_init_string_error_memory_header
 
 	bt  dword [ebx + MULTIBOOT_HEADER.flags], KERNEL_INIT_MEMORY_MULTIBOOT_FLAG_memory_map
 	jnc kernel_panic
@@ -28,7 +27,6 @@ kernel_init_memory:
 	sub ecx, KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP.SIZE
 	jnz .search
 
-	mov  ecx, kernel_init_string_error_memory_end - kernel_init_string_error_memory
 	mov  rsi, kernel_init_string_error_memory
 	call kernel_panic
 
