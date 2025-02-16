@@ -5,8 +5,6 @@ kernel_init_string_name_end:
 
 	; These strings are used for error reporting during kernel bootup.
 	; Each message is null-terminated (STATIC_ASCII_TERMINATOR).
-	kernel_init_string_error_video_header db "Error: no graphic mode header in multiboot table", STATIC_ASCII_TERMINATOR
-	kernel_init_string_error_memory_header db "Error: no memory map header in multiboot header", STATIC_ASCII_TERMINATOR
 	kernel_init_string_error_memory db "Error: memory map damaged", STATIC_ASCII_TERMINATOR
 	kernel_init_string_error_memory_low db "Error: not enough memory", STATIC_ASCII_TERMINATOR
 	kernel_init_string_error_acpi_header db "Error: RSDP/XSDP not found", STATIC_ASCII_TERMINATOR

@@ -2,7 +2,7 @@
 %include "kernel/config.asm"
 %include "kernel/macro/apic.asm"
 
-	[BITS 32]
+	[BITS 64]
 
 	[ORG KERNEL_BASE_address]
 
@@ -58,5 +58,7 @@ kernel:
 %include "include/page_from_size.asm"
 %include "include/string_compare.asm"
 %include "include/string_cut.asm"
+
+align KERNEL_PAGE_SIZE_byte
 
 kernel_end:

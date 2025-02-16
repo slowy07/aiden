@@ -1,18 +1,11 @@
 cmp byte [kernel_init_smp_semaphore], STATIC_FALSE
-je  .entry
+je  kernel_init
 
-%include "kernel/init/ap.asm"
-
-.entry:
-	%include "kernel/init/long_mode.asm"
 	%include "kernel/init/data.asm"
-	%include "kernel/init/multiboot.asm"
-	[BITS    64]
-
 	%include "kernel/init/apic.asm"
 
 kernel_init:
-  %include "kernel/init/serial.asm"
+  	%include "kernel/init/serial.asm"
 	%include "kernel/init/video.asm"
 	%include "kernel/init/memory.asm"
 	%include "kernel/init/acpi.asm"
@@ -30,19 +23,9 @@ kernel_init:
 
 	call kernel_init_apic
 
-	mov dword [rsi + KERNEL_APIC_TICR_register], DRIVER_RTC_Hz
-
-	mov dword [rsi + KERNEL_APIC_EOI_register], STATIC_EMPTY
-
-	%include "kernel/init/smp.asm"
-
-.wait:
-	mov al, byte [kernel_init_ap_count]
-	inc al
-
-	cmp al, byte [kernel_apic_count]
-	jne .wait
-
+	mov dword [rdi + KERNEL_APIC_TICR_register], DRIVER_RTC_Hz
+	
+	mov dword [rdi + KERNEL_APIC_EOI_register], STATIC_EMPTY
 	mov byte [kernel_init_semaphore], STATIC_FALSE
 
 	jmp clean
