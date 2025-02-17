@@ -26,6 +26,18 @@ kernel_init:
 	mov dword [rdi + KERNEL_APIC_TICR_register], DRIVER_RTC_Hz
 	
 	mov dword [rdi + KERNEL_APIC_EOI_register], STATIC_EMPTY
+	
+	xchg bx, bx
+
+	%include "kernel/init/smp.asm"
+
+.wait:
+	mov al, byte [kernel_init_ap_count]
+	inc al
+
+	cmp al, byte [kernel_apic_count]
+	jne .wait
+
 	mov byte [kernel_init_semaphore], STATIC_FALSE
 
 	jmp clean

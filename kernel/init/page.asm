@@ -38,12 +38,6 @@ kernel_init_page:
 	call kernel_page_map_physical
 	jc   kernel_panic_memory
 
-	mov  eax, 0x8000
-	mov  ecx, kernel_init_boot_file_end - kernel_init_boot_file
-	call include_page_from_size
-	call kernel_page_map_physical
-	jc   kernel_panic_memory
-
 	mov rax, rdi
 	mov cr3, rax
 
