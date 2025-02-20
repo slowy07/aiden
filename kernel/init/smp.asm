@@ -2,9 +2,16 @@ kernel_init_smp:
 	cmp word [kernel_apic_count], STATIC_TRUE
 	jbe .finish
 
+	mov eax, 0x7000
+	mov bx, KERNEL_PAGE_FLAG_available | KERNEL_PAGE_FLAG_write
+	mov ecx, kernel_init_boot_file_end - kernel_init_boot_file
+	mov r11, qword [kernel_page_pml4_address]
+	call include_page_from_size
+	call kernel_page_map_physical
+
 	mov ecx, kernel_init_boot_file_end - kernel_init_boot_file
 	mov rsi, kernel_init_boot_file
-	mov rdi, 0x8000
+	mov rdi, 0x7000
 	rep movsb
 
 	mov byte [kernel_init_smp_semaphore], STATIC_TRUE
@@ -62,7 +69,7 @@ kernel_init_smp:
 
 	shl eax, 24
 	mov dword [rdi + KERNEL_APIC_ICH_register], eax
-	mov eax, 0x00004608
+	mov eax, 0x00004607
 	mov dword [rdi + KERNEL_APIC_ICL_register], eax
 
 .start_wait:

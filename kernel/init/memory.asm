@@ -1,6 +1,4 @@
-KERNEL_INIT_MEMORY_MULTIBOOT_FLAG_memory_map equ 6
-
-struc    KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP
+struc    KERNEL_INIT_MEMORY_STRUCTURE_MEMORY_MAP
 .size    resb 4
 .address resb 8
 .limit   resb 8
@@ -10,28 +8,19 @@ struc    KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP
 	endstruc
 
 kernel_init_memory:
-	mov rsi, kernel_init_string_error_memory_header
+	cmp qword [ebx + KERNEL_INIT_MEMORY_STRUCTURE_MEMORY_MAP.address], KERNEL_BASE_address
+	je .found
+	
+	add ebx, KERNEL_INIT_MEMORY_STRUCTURE_MAP.SIZE
+	
+	cmp qword [ebx], STATIC_EMPTY
+	jne kernel_init_memory
 
-	bt  dword [ebx + MULTIBOOT_HEADER.flags], KERNEL_INIT_MEMORY_MULTIBOOT_FLAG_memory_map
-	jnc kernel_panic
-
-	mov ecx, dword [ebx + MULTIBOOT_HEADER.mmap_length]
-	mov ebx, dword [ebx + MULTIBOOT_HEADER.mmap_addr]
-
-.search:
-	cmp qword [ebx + KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP.address], KERNEL_BASE_address
-	je  .found
-
-	add ebx, KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP.SIZE
-
-	sub ecx, KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP.SIZE
-	jnz .search
-
-	mov  rsi, kernel_init_string_error_memory
+	mov rsi, kernel_init_string_error_memory
 	call kernel_panic
 
 .found:
-	mov rcx, qword [rbx + KERNEL_INIT_MEMORY_MULTIBOOT_STRUCTURE_MEMORY_MAP.limit]
+	mov rcx, qword [rbx + KERNEL_INIT_MEMORY_STRUCTURE_MEMORY_MAP.limit]
 	shr rcx, STATIC_DIVIDE_BY_PAGE_shift
 
 	mov qword [kernel_page_total_count], rcx
