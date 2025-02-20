@@ -1,11 +1,15 @@
-KERNEL_FONT_WIDTH_pixel equ 6
-KERNEL_FONT_HEIGHT_pixel equ 12
+	; Define constants for font dimensions in pixels
+	KERNEL_FONT_WIDTH_pixel equ 6       ; Width of the font (in pixels)
+	KERNEL_FONT_HEIGHT_pixel equ 12     ; Height of the font (in pixels)
 
-kernel_font_width_pixel dq KERNEL_FONT_WIDTH_pixel
-kernel_font_height_pixel dq KERNEL_FONT_HEIGHT_pixel
-kernel_font_width_byte dq KERNEL_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
+	; Declare the variables to store the font dimensions in memory
+	kernel_font_width_pixel dq KERNEL_FONT_WIDTH_pixel    ; Store the font width in pixels
+	kernel_font_height_pixel dq KERNEL_FONT_HEIGHT_pixel  ; Store the font height in pixels
 
-kernel_font_string_name db STATIC_COLOR_ASCII_WHITE, "Canele", STATIC_COLOR_ASCII_GRAY, " reference font addy-dclxvi.github.io/"
+	; Calculate the width of the font in bytes
+	kernel_font_width_byte dq KERNEL_FONT_WIDTH_pixel << KERNEL_VIDEO_DEPTH_shift
+
+	kernel_font_string_name  db STATIC_COLOR_ASCII_WHITE, "Canele", STATIC_COLOR_ASCII_GRAY, " reference font addy-dclxvi.github.io"
 
 kernel_font_string_name_end:
 
